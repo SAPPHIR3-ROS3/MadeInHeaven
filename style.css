@@ -22,57 +22,37 @@ body
 {
     width: 60px;
     height: 60px;
-    background-color: yellow;
+    background: url('media/sun.png') center center/cover no-repeat;
     border-radius: 50%;
     position: absolute;
     left: 50%;
     top: 50%;
-    box-shadow:
-        inset 6px 6px 10px 0px rgba(0, 0, 0, 0.3),
-        inset -6px -6px 30px 0px rgba(255, 0, 0, 0.5),
-        0px 0px 50px 10px rgb(143, 143, 0);
+    box-shadow: 0px 0px 100px 50px rgba(230, 96, 0, 0.8), rgba(1, 1, 24, 0.5);
     transform: translate(-50%, -50%);
 }
 
 .mercury
 {
-        width: 10px;
-        height: 10px;
-        background-color:rgb(16, 138, 252);
-        border-radius: 50%;
-        position: absolute;
-        left: 50%;
-        top: 44.5%;
-        box-shadow:
-            inset 0px 2px 2px 0px rgb(204, 151, 38),
-            inset -2px -2px 1px 0px rgb(204, 151, 38);
-        transform: translate(-50%, -50%);
-}
-
-.mercury::before
-{
-    content: '';
-    width: 40%;
-    height: 40%;
-    background: radial-gradient(circle, rgba(204, 151, 38, 0.8) 30%, rgba(204, 151, 38, 0) 90%);
+    width: 10px;
+    height: 10px;
+    background: url('media/mercury.png') center center/cover no-repeat;
     border-radius: 50%;
     position: absolute;
-    left: 20%;
-    top: 20%;
+    left: 50%;
+    top: 44.5%;
+    transform: translate(-50%, -50%);
 }
+
 
 .venus
 {
     width: 20px;
     height: 20px;
-    background-color: rgb(171, 95, 28);
+    background: url('media/venus.png') center center/cover no-repeat;
     border-radius: 50%;
     position: absolute;
     left: 50%;
     top: 41.5%;
-    box-shadow:
-        inset 0 -5px 1px 1px rgba(0, 0, 0, 0.3),
-        inset 0 5px  1px 1px rgba(0, 0, 0, 0.3);
     transform: translate(-50%, -50%);
 }
 
@@ -80,7 +60,7 @@ body
 {
     width: 21px;
     height: 21px;
-    background-color: rgb(8, 28, 84);
+    background: url('media/earth.png') center center/cover no-repeat;
     border-radius: 50%;
     position: absolute;
     left: 50%;
