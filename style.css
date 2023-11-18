@@ -1,0 +1,89 @@
+body
+{
+    margin: 0px;
+    padding: 0px;
+    background-color: rgb(1, 1, 24);
+}
+
+.space
+{
+    position: relative;
+}
+
+.star-dot
+{
+    background-color:rgb(143, 143, 0);
+    position: absolute;
+    border-radius: 50%;
+    box-shadow: 0 0 10px 2px rgb(143, 143, 0, 1), 0 0 20px 4px rgba(0, 0, 0, 0);
+}
+
+.sun
+{
+    width: 60px;
+    height: 60px;
+    background-color: yellow;
+    border-radius: 50%;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    box-shadow:
+        inset 6px 6px 10px 0px rgba(0, 0, 0, 0.3),
+        inset -6px -6px 30px 0px rgba(255, 0, 0, 0.5),
+        0px 0px 50px 10px rgb(143, 143, 0);
+    transform: translate(-50%, -50%);
+}
+
+.mercury
+{
+        width: 10px;
+        height: 10px;
+        background-color:rgb(16, 138, 252);
+        border-radius: 50%;
+        position: absolute;
+        left: 50%;
+        top: 44.5%;
+        box-shadow:
+            inset 0px 2px 2px 0px rgb(204, 151, 38),
+            inset -2px -2px 1px 0px rgb(204, 151, 38);
+        transform: translate(-50%, -50%);
+}
+
+.mercury::before
+{
+    content: '';
+    width: 40%;
+    height: 40%;
+    background: radial-gradient(circle, rgba(204, 151, 38, 0.8) 30%, rgba(204, 151, 38, 0) 90%);
+    border-radius: 50%;
+    position: absolute;
+    left: 20%;
+    top: 20%;
+}
+
+.venus
+{
+    width: 20px;
+    height: 20px;
+    background-color: rgb(171, 95, 28);
+    border-radius: 50%;
+    position: absolute;
+    left: 50%;
+    top: 41.5%;
+    box-shadow:
+        inset 0 -5px 1px 1px rgba(0, 0, 0, 0.3),
+        inset 0 5px  1px 1px rgba(0, 0, 0, 0.3);
+    transform: translate(-50%, -50%);
+}
+
+.earth
+{
+    width: 21px;
+    height: 21px;
+    background-color: rgb(8, 28, 84);
+    border-radius: 50%;
+    position: absolute;
+    left: 50%;
+    top: 38%;
+    transform: translate(-50%, -50%);
+}
