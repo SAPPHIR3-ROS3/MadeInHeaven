@@ -2,7 +2,7 @@ body
 {
     margin: 0px;
     padding: 0px;
-    background-color: rgb(1, 1, 24);
+    background-color: rgb(0, 0, 24);
 }
 
 .space
@@ -16,6 +16,15 @@ body
     position: absolute;
     border-radius: 50%;
     box-shadow: 0 0 10px 2px rgb(143, 143, 0, 1), 0 0 20px 4px rgba(0, 0, 0, 0);
+    z-index: 1;
+}
+
+.solar-object
+{
+    border-radius: 50%;
+    position: absolute;
+    transform: translate(-50%, -50%);
+    z-index: 2;
 }
 
 .sun
@@ -23,12 +32,9 @@ body
     width: 60px;
     height: 60px;
     background: url('media/sun.png') center center/cover no-repeat;
-    border-radius: 50%;
-    position: absolute;
     left: 50%;
     top: 50%;
-    box-shadow: 0px 0px 100px 50px rgba(230, 96, 0, 0.8), rgba(1, 1, 24, 0.5);
-    transform: translate(-50%, -50%);
+    box-shadow: 0 0 10px 10px rgba(230, 96, 0, 0.7);
 }
 
 .mercury
@@ -36,11 +42,8 @@ body
     width: 10px;
     height: 10px;
     background: url('media/mercury.png') center center/cover no-repeat;
-    border-radius: 50%;
-    position: absolute;
     left: 50%;
-    top: 44.5%;
-    transform: translate(-50%, -50%);
+    top: 44%;
 }
 
 
@@ -49,11 +52,8 @@ body
     width: 20px;
     height: 20px;
     background: url('media/venus.png') center center/cover no-repeat;
-    border-radius: 50%;
-    position: absolute;
     left: 50%;
-    top: 41.5%;
-    transform: translate(-50%, -50%);
+    top: 41%;
 }
 
 .earth
@@ -61,9 +61,24 @@ body
     width: 21px;
     height: 21px;
     background: url('media/earth.png') center center/cover no-repeat;
-    border-radius: 50%;
-    position: absolute;
     left: 50%;
-    top: 38%;
-    transform: translate(-50%, -50%);
+    top: 37%;
+}
+
+.mars
+{
+    width: 15px;
+    height: 15px;
+    background: url('media/mars.png') center center/cover no-repeat;
+    left: 50%;
+    top: 33%;
+}
+
+.jupiter
+{
+    width: 40px;
+    height: 40px;
+    background: url('media/jupyter.png') center center/cover no-repeat;
+    left: 50%;
+    top: 25%;
 }
