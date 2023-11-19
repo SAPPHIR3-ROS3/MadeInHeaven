@@ -10,9 +10,21 @@ body
     width: 99.3vw;
     height: 99.3vh;
 }
+.orbit {
+    aspect-ratio: 1 / 1;
+    left: 50%;
+    top: 50%;
+    position: absolute;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    border-radius: 50%;
+    box-sizing: border-box;
+    transform: translate(-50%, -50%);
+    z-index: 1;
+ }
 
 .star-dot
 {
+    aspect-ratio: 1 / 1;
     background-color:rgb(143, 143, 0);
     position: absolute;
     border-radius: 50%;
@@ -22,6 +34,7 @@ body
 
 .asteroid-belt-rock
 {
+    aspect-ratio: 1 / 1;
     background-color:rgb(167, 89, 0);
     position: absolute;
     border-radius: 50%;
@@ -30,6 +43,7 @@ body
 
 .solar-object
 {
+    aspect-ratio: 1 / 1;
     margin: 1px;
     border-radius: 50%;
     position: absolute;
@@ -40,7 +54,6 @@ body
 .sun
 {
     width: 60px;
-    height: 60px;
     background: url('media/sun.png') center center/cover no-repeat;
     left: 50%;
     top: 50%;
@@ -50,7 +63,6 @@ body
 .mercury
 {
     width: 10px;
-    height: 10px;
     background: url('media/mercury.png') center center/cover no-repeat;
     left: 50%;
     top: 44%;
@@ -60,7 +72,6 @@ body
 .venus
 {
     width: 20px;
-    height: 20px;
     background: url('media/venus.png') center center/cover no-repeat;
     left: 50%;
     top: 41%;
@@ -69,7 +80,6 @@ body
 .earth
 {
     width: 21px;
-    height: 21px;
     background: url('media/earth.png') center center/cover no-repeat;
     left: 50%;
     top: 37%;
@@ -78,7 +88,6 @@ body
 .mars
 {
     width: 15px;
-    height: 15px;
     background: url('media/mars.png') center center/cover no-repeat;
     left: 50%;
     top: 33%;
@@ -87,7 +96,6 @@ body
 .jupiter
 {
     width: 40px;
-    height: 40px;
     background: url('media/jupiter.png') center center/cover no-repeat;
     left: 50%;
     top: 25%;
@@ -96,7 +104,6 @@ body
 .saturn
 {
     width: 38px;
-    height: 38px;
     background: url('media/saturn.png') center center/cover no-repeat;
     left: 50%;
     top: 18%;  
@@ -132,7 +139,6 @@ body
 .uranus
 {
     width:30px;
-    height: 30px;
     background: url('media/uranus.png') center center/cover no-repeat;
     left: 50%;
     top: 13%;
@@ -141,7 +147,6 @@ body
 .neptune
 {
     width:29px;
-    height: 29px;
     background: url('media/neptune.png') center center/cover no-repeat;
     left: 50%;
     top: 8%;
@@ -150,7 +155,6 @@ body
 .pluto
 {
     width:8px;
-    height: 8px;
     background: url('media/pluto.png') center center/cover no-repeat;
     left: 50%;
     top: 4%;
