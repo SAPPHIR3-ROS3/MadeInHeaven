@@ -90,7 +90,7 @@ body
     height: 38px;
     background: url('media/saturn.png') center center/cover no-repeat;
     left: 50%;
-    top: 19%;
+    top: 18%;
     box-shadow: inset -3px 0 5px rgba(0, 0, 0, 0.3), inset 3px 0 5px rgba(255, 255, 255, 0.3);
 }
 
@@ -127,14 +127,14 @@ body
     height: 30px;
     background: url('media/uranus.png') center center/cover no-repeat;
     left: 50%;
-    top: 14%;
+    top: 13%;
 }
 
 .neptune
 {
-    width:30px;
-    height: 30px;
-    background: url('media/uranus.png') center center/cover no-repeat;
+    width:29px;
+    height: 29px;
+    background: url('media/neptune.png') center center/cover no-repeat;
     left: 50%;
-    top: 14%;
+    top: 8%;
 }
