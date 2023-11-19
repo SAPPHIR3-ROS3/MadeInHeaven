@@ -113,7 +113,7 @@ body
     width: 200%;
     height: 30%;
     position: absolute;
-    top: 50%;
+    top: 55%;
     left: 50%;
     transform: translate(-50%, -50%);
     background-color: rgba(255, 255, 255, 0.8);
@@ -137,4 +137,13 @@ body
     background: url('media/neptune.png') center center/cover no-repeat;
     left: 50%;
     top: 8%;
+}
+
+.pluto
+{
+    width:8px;
+    height: 8px;
+    background: url('media/pluto.png') center center/cover no-repeat;
+    left: 50%;
+    top: 4%;
 }
