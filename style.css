@@ -120,3 +120,13 @@ body
     border-radius: 50%; 
     clip-path: polygon(0 20%, 100% 20%, 100% 100%, 0 100%);
 }
+
+.uranus
+{
+    width:30px;
+    height: 30px;
+    background: url('media/uranus.png') center center/cover no-repeat;
+    left: 50%;
+    top: 14%;
+}
+
