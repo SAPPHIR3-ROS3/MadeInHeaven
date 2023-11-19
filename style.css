@@ -130,3 +130,11 @@ body
     top: 14%;
 }
 
+.neptune
+{
+    width:30px;
+    height: 30px;
+    background: url('media/uranus.png') center center/cover no-repeat;
+    left: 50%;
+    top: 14%;
+}
