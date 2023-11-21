@@ -59,10 +59,19 @@ body
     z-index: 2; 
 }
 
+.orbit
+{
+    aspect-ratio: 1/1;
+    position: absolute;
+    border-radius: 50%;
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.5);
+    z-index: 1;
+}
+
 .solar-object
 {
     aspect-ratio: 1 / 1;
-    margin: 1px;
+    margin: 0px;
     border-radius: 50%;
     position: absolute;
     transform: translate(-50%, -50%);
