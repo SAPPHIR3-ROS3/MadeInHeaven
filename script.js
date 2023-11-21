@@ -16,66 +16,62 @@ function GenerateStarDots() {
 
         Space.appendChild(StarDot);
     }
-
-}
-
-function GenerateOrbits() {
-    
 }
 
 function GenerateAsteroidsBelt() {
-    var AsteroidsBelt = document.createElement('div');
+    const AsteroidsBelt = document.createElement('div');
     AsteroidsBelt.classList.add('asteroids-belt');
-    document.body.appendChild(AsteroidsBelt);
-  
-    var space = document.querySelector('.space').getBoundingClientRect();
-    var DistanceToTop = space.height / 2;
-    var InnerRadius = 0.39 * DistanceToTop;
-    var OuterRadius = 0.42 * DistanceToTop;
-    
-    var asteroids = 500;
-  
-    for (var i = 0; i < asteroids; i++) {
-      var asteroid = document.createElement('div');
-      asteroid.classList.add('asteroid-belt-rock');
-  
-      asteroid.dataset.angle = (i / asteroids) * 2 * Math.PI;
-      asteroid.dataset.radius = InnerRadius + Math.random() * (OuterRadius - InnerRadius);
-      var x = (space.width / 2) + Math.cos(asteroid.dataset.angle) * asteroid.dataset.radius;
-      var y = (space.height / 2) + Math.sin(asteroid.dataset.angle) * asteroid.dataset.radius;
 
-      var size = Math.random() * 5 + 1;
-      asteroid.style.width = size + 'px';
-      asteroid.style.height = size + 'px';
-  
-      asteroid.style.left = x + 'px';
-      asteroid.style.top = y + 'px';
-  
-      AsteroidsBelt.appendChild(asteroid);
+    var CenterY = window.innerHeight / 2;
+    var CenterX = window.innerWidth / 2;
+    const InnerRadius = 0.48 * CenterY;
+    const OuterRadius = 0.56 * CenterY;
+    const AsteroidMinRadius = 2;
+    const AsteroidMaxRadius = 5
+    const asteroids = 1800;
+
+    for (let i = 0; i < asteroids; i++)
+    {
+        var asteroid = document.createElement('div');
+        asteroid.classList.add('asteroids-belt-rock');
+
+        asteroid.dataset.angle = (i / asteroids) * 2 * Math.PI;
+        asteroid.dataset.radius = InnerRadius + (OuterRadius - InnerRadius) * Math.random();
+        const x = Math.cos(asteroid.dataset.angle) * asteroid.dataset.radius;
+        const y = Math.sin(asteroid.dataset.angle) * asteroid.dataset.radius;
+
+        const size = Math.random() * AsteroidMaxRadius + AsteroidMinRadius;
+        asteroid.style.width = size + 'px';
+        asteroid.style.height = size + 'px';
+        asteroid.style.left = CenterX + x - size + 'px';
+        asteroid.style.top = CenterY + y - size + 'px';
+
+        AsteroidsBelt.appendChild(asteroid);
     }
+
+    document.body.appendChild(AsteroidsBelt);
 }
 
 function RepositionAsteroids() {
     var space = document.querySelector('.space').getBoundingClientRect();
     var asteroids = document.querySelectorAll('.asteroid-belt-rock');
-    
-    for(let i = 0; i < asteroids.length; i++)
-    {
+
+    for (let i = 0; i < asteroids.length; i++) {
         const asteroid = asteroids[i];
         var x = (space.width / 2) + Math.cos(asteroid.dataset.angle) * asteroid.dataset.radius;
         var y = (space.height / 2) + Math.sin(asteroid.dataset.angle) * asteroid.dataset.radius;
-        
+
         asteroid.style.left = x + 'px';
         asteroid.style.top = y + 'px';
     }
 }
-
 
 document.addEventListener('DOMContentLoaded', 
 function()
 {
     GenerateStarDots();
     GenerateAsteroidsBelt();
+    //GenerateOrbits();
 });
 
-setInterval(function(){RepositionAsteroids();}, 1000/250);
+//window.addEventListener('resize', function(){RepositionAsteroids();});
