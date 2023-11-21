@@ -1,44 +1,62 @@
 body
 {
     margin: 0;
-    background-color: rgb(0, 0, 24);
+    background-color: rgb(0, 0, 25);
+    overflow: hidden;
 }
 
-.space
+.X-axys
 {
-    position: absolute;
-    width: 99.3vw;
-    height: 99.3vh;
-}
-.orbit {
-    aspect-ratio: 1 / 1;
-    left: 50%;
+    width: 100%;
+    height: 1px;
     top: 50%;
+    background-color: magenta;
     position: absolute;
-    border: 2px solid rgba(255, 255, 255, 0.5);
-    border-radius: 50%;
-    box-sizing: border-box;
-    transform: translate(-50%, -50%);
-    z-index: 1;
- }
+    z-index: 32;
+}
 
-.star-dot
+.Y-axys
 {
-    aspect-ratio: 1 / 1;
-    background-color:rgb(143, 143, 0);
+    width: 1px;
+    height: 100%;
+    left: 50%;
+    background-color: magenta;
+    position: absolute;
+    z-index: 32;
+}
+
+.test-container
+{
+    aspect-ratio: 1/1;
+    border-radius: 50%;
+    position: absolute;
+    top:50%;
+    left:50%;
+    width:20%;
+    background-color: cyan;
+    transform: translate(-50%, -50%); 
+    z-index: 5;
+    visibility: hidden;
+}
+
+.star-dot{
+    aspect-ratio: 1/1;
     position: absolute;
     border-radius: 50%;
-    box-shadow: 0 0 10px 2px rgb(143, 143, 0, 1), 0 0 20px 4px rgba(0, 0, 0, 0);
+    background-color: yellow;
+    box-shadow: 0 0 5px 2px rgba(255, 255, 0, 0.8);
+    transform: translate(-50%, -50%);
     z-index: 0;
 }
 
-.asteroid-belt-rock
+.asteroids-belt-rock
 {
-    aspect-ratio: 1 / 1;
-    background-color:rgb(167, 89, 0);
+    aspect-ratio: 1/1;
     position: absolute;
     border-radius: 50%;
-    z-index: 2;
+    background-color: rgb(180, 102, 0);
+    transform: translate(50%, 50%); 
+    z-index: 2; 
 }
 
 .solar-object
@@ -65,16 +83,15 @@ body
     width: 10px;
     background: url('media/mercury.png') center center/cover no-repeat;
     left: 50%;
-    top: 44%;
+    top: 50%;
 }
-
 
 .venus
 {
     width: 20px;
     background: url('media/venus.png') center center/cover no-repeat;
     left: 50%;
-    top: 41%;
+    top: 50%;
 }
 
 .earth
@@ -82,7 +99,7 @@ body
     width: 21px;
     background: url('media/earth.png') center center/cover no-repeat;
     left: 50%;
-    top: 37%;
+    top: 50%;
 }
 
 .mars
@@ -90,7 +107,7 @@ body
     width: 15px;
     background: url('media/mars.png') center center/cover no-repeat;
     left: 50%;
-    top: 33%;
+    top: 50%;
 }
 
 .jupiter
@@ -98,18 +115,20 @@ body
     width: 40px;
     background: url('media/jupiter.png') center center/cover no-repeat;
     left: 50%;
-    top: 25%;
+    top: 50%;
 }
+
 
 .saturn
 {
     width: 38px;
     background: url('media/saturn.png') center center/cover no-repeat;
     left: 50%;
-    top: 18%;  
+    top: 50%;  
 }
 
-.saturn::before {
+.saturn::before
+{
     content: "";
     display: block;
     width: 100%;
@@ -122,7 +141,8 @@ body
     z-index: 3;
 }
 
-.saturn::after {
+.saturn::after 
+{
     content: "";
     display: block;
     width: 200%;
@@ -141,7 +161,7 @@ body
     width:30px;
     background: url('media/uranus.png') center center/cover no-repeat;
     left: 50%;
-    top: 13%;
+    top: 50%;
 }
 
 .neptune
@@ -149,7 +169,7 @@ body
     width:29px;
     background: url('media/neptune.png') center center/cover no-repeat;
     left: 50%;
-    top: 8%;
+    top: 50%;
 }
 
 .pluto
@@ -157,5 +177,5 @@ body
     width:8px;
     background: url('media/pluto.png') center center/cover no-repeat;
     left: 50%;
-    top: 4%;
+    top: 50%;
 }
