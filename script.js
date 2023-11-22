@@ -24,11 +24,11 @@ function GenerateAsteroidsBelt() {
 
     var CenterY = window.innerHeight / 2;
     var CenterX = window.innerWidth / 2;
-    const InnerRadius = 0.43 * CenterY;
-    const OuterRadius = 0.47 * CenterY;
+    const InnerRadius = 0.47 * CenterY;
+    const OuterRadius = 0.51 * CenterY;
     const AsteroidMinRadius = 2;
     const AsteroidMaxRadius = 5
-    const asteroids = 600;
+    const asteroids = 400;
 
     for (let i = 0; i < asteroids; i++)
     {
@@ -57,7 +57,8 @@ function RepositionAsteroids() {
     var CenterX = window.innerWidth / 2;
     var asteroids = document.querySelectorAll('.asteroids-belt-rock');
 
-    for (let i = 0; i < asteroids.length; i++) {
+    for (let i = 0; i < asteroids.length; i++)
+    {
         const asteroid = asteroids[i];
         var x = CenterX + Math.cos(asteroid.dataset.angle) * asteroid.dataset.radius;
         var y = CenterY + Math.sin(asteroid.dataset.angle) * asteroid.dataset.radius;
@@ -70,12 +71,12 @@ function RepositionAsteroids() {
 function GenerateOrbits() {
     const Orbits = document.createElement('div');
     Orbits.classList.add('orbits');
-
+    Planets = Array.from(document.querySelectorAll('.solar-object')).slice(1);
     var CenterY = window.innerHeight / 2;
     var CenterX = window.innerWidth / 2;
     const MinRadius = document.querySelector('.sun').offsetHeight;
-    const MaxRadius = CenterY;
-    const NumOrbits = 11;
+    const MaxRadius = CenterY + 0.05 * CenterY;
+    const NumOrbits = 10;
 
     for(let i = 0; i < NumOrbits; i++)
     {
@@ -97,14 +98,45 @@ function GenerateOrbits() {
     }
 
     document.body.appendChild(Orbits);
+
+    for(let i = 0; i < NumOrbits - 1; i++)
+    {
+        const index = (i < 4) ? i : i + 1;
+        const percentage = index / NumOrbits;
+        const radius = MinRadius + percentage * (MaxRadius - MinRadius);
+        Planets[i].style.top = CenterY - radius + 'px';
+    }
+}
+
+function RepositionOrbits() {
+    var CenterY = window.innerHeight / 2;
+    var CenterX = window.innerWidth / 2;
+    var orbits = document.querySelectorAll('.orbit');
+    const MinRadius = document.querySelector('.sun').offsetHeight;
+    const MaxRadius = CenterY + 0.05 * CenterY;
+
+    for (let i = 0; i < orbits.length; i++)
+    {
+        const percentage = i / orbits.length;
+        const radius = MinRadius + percentage * (MaxRadius - MinRadius);
+        const orbit = orbits[i];
+
+        orbit.style.left = CenterX - radius + 'px';
+        orbit.style.top = CenterY - radius + 'px';
+    }
 }
 
 document.addEventListener('DOMContentLoaded', 
 function()
 {
     GenerateStarDots();
-    GenerateAsteroidsBelt();
     GenerateOrbits();
+    GenerateAsteroidsBelt();
 });
 
-window.addEventListener('resize', function(){RepositionAsteroids();});
+window.addEventListener('resize', 
+function()
+{
+    RepositionOrbits();
+    RepositionAsteroids();
+});
