@@ -139,7 +139,7 @@ function OrbitAround(CenterOrbit, OrbitingObject, OrbitTime = 1, InitialAngle = 
         const y = CenterY + radius * Math.sin(angle);
         OrbitingObject.style.left = x - OrbitingObject.clientWidth / 2 + 'px';
         OrbitingObject.style.top = y - OrbitingObject.clientHeight / 2 + 'px';
-        angle += AngularVelocity * 0.016;
+        angle += AngularVelocity * FrameDelta;
     }, Math.floor(FrameDelta * 1000));
 }
 
