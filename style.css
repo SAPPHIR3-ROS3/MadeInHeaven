@@ -84,7 +84,7 @@ body
 {
     aspect-ratio: 1 / 1;
     margin: 0px;
-    border-radius: 50%;
+
     position: absolute;
     z-index: 3;
 }
