@@ -80,6 +80,15 @@ body
     z-index: 2;
 }
 
+.satellite
+{
+    aspect-ratio: 1 / 1;
+    margin: 0px;
+    border-radius: 50%;
+    position: absolute;
+    z-index: 3;
+}
+
 .sun
 {
     width: 60px;
