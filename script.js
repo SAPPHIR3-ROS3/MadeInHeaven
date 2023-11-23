@@ -126,6 +126,23 @@ function RepositionOrbits() {
     }
 }
 
+function OrbitAround(CenterOrbit, OrbitingObject, OrbitTime = 1, InitialAngle = 0, radius = 50){
+    const FrameDelta = (1/60).toFixed(4);
+    const AngularVelocity = (2 * Math.PI) / OrbitTime;
+    let angle = InitialAngle * (Math.PI / 180);
+
+    setInterval(() => 
+    {
+        const CenterX = CenterOrbit.offsetLeft + CenterOrbit.offsetWidth / 2;
+        const CenterY = CenterOrbit.offsetTop + CenterOrbit.offsetHeight / 2;
+        const x = CenterX + radius * Math.cos(angle);
+        const y = CenterY + radius * Math.sin(angle);
+        OrbitingObject.style.left = x - OrbitingObject.clientWidth / 2 + 'px';
+        OrbitingObject.style.top = y - OrbitingObject.clientHeight / 2 + 'px';
+        angle += AngularVelocity * 0.016;
+    }, Math.floor(FrameDelta * 1000));
+}
+
 document.addEventListener('DOMContentLoaded', 
 function()
 {
