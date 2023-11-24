@@ -135,8 +135,14 @@ body
 
 .phobos
 {
-    width:7px;
+    width: 7px;
     background: url('media/phobos.png') center center/cover no-repeat;
+}
+
+.deimos
+{
+    width: 5px;
+    background: url('media/deimos.png') center center/cover no-repeat;
 }
 
 .jupiter
@@ -153,6 +159,26 @@ body
     background: url('media/io.png') center center/cover no-repeat;
 }
 
+.europa
+{
+    width: 9px;
+    border-radius: 50%;
+    background: url('media/europa.png') center center/cover no-repeat;
+}
+
+.ganymede
+{
+    width: 15px;
+    border-radius: 50%;
+    background: url('media/ganymede.png') center center/cover no-repeat;
+}
+
+.callisto
+{
+    width: 12px;
+    border-radius: 50%;
+    background: url('media/callisto.png') center center/cover no-repeat;
+}
 
 .saturn
 {
@@ -190,11 +216,39 @@ body
     clip-path: polygon(0 20%, 100% 20%, 100% 100%, 0 100%);
 }
 
+.titan
+{
+    width: 15px;
+    border-radius: 50%;
+    background: url('media/titan.png') center center/cover no-repeat;
+}
+
+.rhea
+{
+    width: 5px;
+    border-radius: 50%;
+    background: url('media/titan.png') center center/cover no-repeat;
+}
+
 .uranus
 {
     width:30px;
     background: url('media/uranus.png') center center/cover no-repeat;
     left: 50%;
+}
+
+.titania
+{
+    width: 7px;
+    border-radius: 50%;
+    background: url('media/titania.png') center center/cover no-repeat;
+}
+
+.oberon
+{
+    width: 7px;
+    border-radius: 50%;
+    background: url('media/oberon.png') center center/cover no-repeat;
 }
 
 .neptune
@@ -204,9 +258,30 @@ body
     left: 50%;
 }
 
+.nereide
+{
+    width: 5px;
+    border-radius: 50%;
+    background: url('media/nereide.png') center center/cover no-repeat;
+}
+
+.proteus
+{
+    width: 5px;
+    border-radius: 50%;
+    background: url('media/proteus.png') center center/cover no-repeat;
+}
+
 .pluto
 {
     width:8px;
     background: url('media/pluto.png') center center/cover no-repeat;
     left: 50%;
+}
+
+.proteus
+{
+    width: 7px;
+    border-radius: 50%;
+    background: url('media/charon.png') center center/cover no-repeat;
 }
