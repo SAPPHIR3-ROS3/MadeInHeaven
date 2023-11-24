@@ -1,6 +1,24 @@
-var OrbitPeriodMultiplier = [1/3, 2/3, 3/3 , 4/3, 6/3, 7/3, 8/3, 9/3, 10/3]
+var OrbitPeriodMultiplier = [1/3, 2/3, 3/3 , 4/3, 6/3, 7/3, 8/3, 9/3, 10/3];
+var SatelliteOrbits = 
+{
+    '.moon': 1/13, 
+    '.phobos': 1/212, 
+    '.deimos': 1/53, 
+    '.io': 1/24, 
+    '.europa': 1/12, 
+    '.ganymede': 1/6, 
+    '.callisto': 1/2, 
+    '.titan': 1/67, 
+    '.rhea': 1/24,
+    '.titania': 1/350,
+    '.oberon': 1/228,
+    '.proteus': 1/538,
+    '.nereide': 1/2,
+    '.charon': 1/142
+};
 var EarthYear = 60;
 var TimeSpeed = 0;
+var RandomPosition = true;
 
 function GenerateStarDots() {
     const Space = document.createElement('div');
@@ -137,7 +155,7 @@ function FetchPlanetsAndSatellites() {
     {
         PlanetsWithSatellites[i].dataset.orbit = OrbitPeriodMultiplier[i];
         PlanetsWithSatellites[i].dataset.angle = 0;
-        let satellites = PlanetsWithSatellites[i].children;
+        let satellites = Array.from(PlanetsWithSatellites[i].children);
 
         for(let j = 0; j < satellites.length; j++)
         {
@@ -147,7 +165,7 @@ function FetchPlanetsAndSatellites() {
             for(let k = 0; k < j; k++)
                 satellites[j].dataset.radius += satellites[k].offsetHeight * 1;
             
-            satellites[j].dataset.radius -= satellites[j].offsetHeight / 2;
+            //satellites[j].dataset.radius -= satellites[j].offsetHeight / 2;
         }
     }
 }
@@ -160,31 +178,41 @@ function DistanceBetween(ObjectA, ObjectB) {
 
 function OrbitAround(CenterOrbit, OrbitingObject, OrbitTime = 1, InitialAngle = 0, radius = 50){
     const FrameDelta = (1/60).toFixed(4);
-    const AngularVelocity = (2 * Math.PI) / OrbitTime;
+    const AngularVelocity = ((2 * Math.PI) / OrbitTime) * TimeSpeed;
     let angle = InitialAngle * (Math.PI / 180);
-    OrbitingObject.dataset.angle = angle;
+    OrbitingObject.dataset.angle = InitialAngle * (Math.PI / 180);
+    console.log(OrbitingObject.dataset.angle);
+    let CenterX = CenterOrbit.offsetLeft;
+    let CenterY = CenterOrbit.offsetTop;
+    let x = CenterX + radius * Math.cos(angle);
+    let y = CenterY + radius * Math.sin(angle);
+    OrbitingObject.style.left = x + 'px';
+    OrbitingObject.style.top = y + 'px';
 
-    setInterval(() => 
+    if(TimeSpeed != 0)
     {
-        const CenterX = CenterOrbit.offsetLeft;
-        const CenterY = CenterOrbit.offsetTop;
-        const x = CenterX + radius * Math.cos(angle);
-        const y = CenterY + radius * Math.sin(angle);
-        OrbitingObject.style.left = x + 'px';
-        OrbitingObject.style.top = y + 'px';
-        angle += AngularVelocity * FrameDelta;
-        OrbitingObject.dataset.angle = angle;
-    }, Math.floor(FrameDelta * 1000));
+        setInterval(() => 
+        {
+            CenterX = CenterOrbit.offsetLeft;
+            CenterY = CenterOrbit.offsetTop;
+            x = CenterX + radius * Math.cos(angle);
+            y = CenterY + radius * Math.sin(angle);
+            OrbitingObject.style.left = x + 'px';
+            OrbitingObject.style.top = y + 'px';
+            angle += AngularVelocity * FrameDelta;
+            OrbitingObject.dataset.angle = angle;
+        }, Math.floor(FrameDelta * 1000));
+    }
 }
 
-function TimeFlow(speed, Random = false) {
+function TimeFlow() {
     const Sun = document.querySelector('.sun');
     let planets = Array.from(document.querySelectorAll('.solar-object')).slice(1);
 
     for(let i = 0; i < planets.length; i++)
     {
-        let OrbitTime = EarthYear * OrbitPeriodMultiplier[i] * speed;
-        let InitialAngle = (Random) ? Math.random() * 360 : planets[i].dataset.angle;
+        let OrbitTime = EarthYear * OrbitPeriodMultiplier[i];
+        let InitialAngle = (RandomPosition) ? Math.random() * 360 : planets[i].dataset.angle;
         let DistanceRadius = DistanceBetween(Sun, planets[i]) * 0.998;
         let satellites = planets[i].children;
 
@@ -192,7 +220,12 @@ function TimeFlow(speed, Random = false) {
 
         for(let j = 0; j < satellites.length; j++)
         {
-            //TODO need to implement a formula for satellites orbit time
+            let SatelliteClass = Array.from(satellites[j])[0];
+            let SatelliteOrbitTime = OrbitTime * SatelliteOrbits[SatelliteClass];
+            let SatelliteAngle = (RandomPosition) ?  Math.random() * 360 : 0;
+            let SatelliteDistanceRadius = satellites[j].dataset.radius;
+
+            OrbitAround(planets[i], satellites[j], SatelliteOrbitTime, SatelliteAngle, SatelliteDistanceRadius);
         }
     }
 }   
@@ -204,7 +237,7 @@ function()
     GenerateStarDots();
     GenerateOrbits();
     GenerateAsteroidsBelt();
-    TimeFlow(TimeSpeed, true);
+    TimeFlow();
 });
 
 window.addEventListener('resize', 
