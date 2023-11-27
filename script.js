@@ -17,15 +17,84 @@ var SatelliteOrbits =
     '.charon': 1/142
 };
 var EarthYear = 60;
-var TimeSpeed = 0;
-var RandomPosition = true;
+var PreviousTimeSpeed = 0;
+var TimeSpeed = 1;
+var RandomPosition = false;
+
+function ToggleBWFilter(seconds, SecondsDelay) {
+    function BWPercentage(gray) {document.body.style.filter = `grayscale(${gray}%)`;}
+  
+    if(TimeSpeed == 0)
+    {
+        for(let gray = 0; gray < 101; gray++)
+            setTimeout(() => {BWPercentage(gray);}, SecondsDelay * 1000 + gray * (seconds - SecondsDelay) * 10);
+    }
+    else
+    {
+        for(let gray = 0; gray < 101; gray++)
+            setTimeout(() => {BWPercentage(100 - gray);}, SecondsDelay * 1000 + gray * (seconds - SecondsDelay) * 10);
+    }
+}
+
+function ManageRing(seconds, SecondsDelay) {
+    const Earth = document.querySelector('.earth');
+    const ring = document.createElement('div');
+    ring.classList.add('ring');
+    Earth.appendChild(ring);
+    
+    function change(diameter) {
+        diameter *= window.innerWidth / 50;
+        ring.style.left = Earth.style.left;
+        ring.style.top = Earth.style.top
+        ring.style.width = diameter + 'px';
+        ring.style.height = diameter + 'px';
+    }
+  
+    if(TimeSpeed == 0)
+    {
+      for(let diameter = 0; diameter < 101; diameter++)
+        setTimeout(() => {change(diameter);}, SecondsDelay * 1000 + diameter * (seconds - SecondsDelay) * 10);
+  
+      setTimeout(() => {ring.remove();}, seconds * 1000);
+    }
+    else
+    {
+      for(let diameter = 0; diameter < 101; diameter++)
+        setTimeout(() => {change(100 - diameter);}, diameter * seconds * 10);
+  
+      setTimeout(() => {ring.remove();}, seconds * 1000);
+    }
+}
+  
+function ZaWarudo() {
+    if(TimeSpeed != 0)
+    { 
+        PreviousTimeSpeed = TimeSpeed;
+        TimeSpeed = 0;
+        let TheWorld = new Audio('media/audio/Star Platinum The World Start.mp3')
+        TheWorld.play();
+        ToggleBWFilter(5, 2);
+        ManageRing(5, 2);
+        //TimeFlow();
+    }
+    else
+    {
+        TimeSpeed = PreviousTimeSpeed;
+        PreviousTimeSpeed = 0;
+        let TheWorld = new Audio('media/audio/Star Platinum The World End.mp3')
+        TheWorld.play();
+        ToggleBWFilter(2);
+        ManageRing(2);
+        //TimeFlow();
+    }
+  }
 
 function GenerateStarDots() {
     const Space = document.createElement('div');
     Space.classList.add('space');
     document.body.appendChild(Space);
 
-    for (let i = 0; i < 400; i++) {
+    for (let i = 0; i < 300; i++) {
         let StarDot = document.createElement('div');
         StarDot.classList.add('star-dot');
 
@@ -46,11 +115,12 @@ function GenerateAsteroidsBelt() {
 
     let CenterY = window.innerHeight / 2;
     let CenterX = window.innerWidth / 2;
-    const InnerRadius = 0.47 * CenterY;
-    const OuterRadius = 0.51 * CenterY;
+    let MinAxys = (CenterY <= CenterX) ? CenterY : CenterX;
+    const InnerRadius = 0.47 * MinAxys;
+    const OuterRadius = 0.51 * MinAxys;
     const AsteroidMinRadius = 2;
     const AsteroidMaxRadius = 5
-    const asteroids = 400;
+    const asteroids = 600;
 
     for (let i = 0; i < asteroids; i++)
     {
@@ -59,6 +129,7 @@ function GenerateAsteroidsBelt() {
 
         asteroid.dataset.angle = (i / asteroids) * 2 * Math.PI;
         asteroid.dataset.radius = InnerRadius + (OuterRadius - InnerRadius) * Math.random();
+        asteroid.dataset.RadiusPercentage = asteroid.dataset.radius / MinAxys;
         const x = Math.cos(asteroid.dataset.angle) * asteroid.dataset.radius;
         const y = Math.sin(asteroid.dataset.angle) * asteroid.dataset.radius;
 
@@ -77,13 +148,15 @@ function GenerateAsteroidsBelt() {
 function RepositionAsteroids() {
     let CenterY = window.innerHeight / 2;
     let CenterX = window.innerWidth / 2;
+    let MinAxys = (CenterY <= CenterX) ? CenterY : CenterX;
     let asteroids = document.querySelectorAll('.asteroids-belt-rock');
 
     for (let i = 0; i < asteroids.length; i++)
     {
-        const asteroid = asteroids[i];
-        let x = CenterX + Math.cos(asteroid.dataset.angle) * asteroid.dataset.radius;
-        let y = CenterY + Math.sin(asteroid.dataset.angle) * asteroid.dataset.radius;
+        let asteroid = asteroids[i];
+        asteroid.dataset.radius = MinAxys * asteroid.dataset.RadiusPercentage;
+        let x = CenterX + Math.cos(asteroid.dataset.angle) * asteroid.dataset.radius - asteroid.offsetWidth;
+        let y = CenterY + Math.sin(asteroid.dataset.angle) * asteroid.dataset.radius - asteroid.offsetHeight;
 
         asteroid.style.left = x + 'px';
         asteroid.style.top = y + 'px';
@@ -107,7 +180,7 @@ function GenerateOrbits() {
 
         const percentage = i / NumOrbits;
         const radius = MinRadius + percentage * (MaxRadius - MinRadius);
-
+        orbit.dataset.radius = radius;
         orbit.style.width = radius * 2 + 'px';
         orbit.style.height = radius * 2 + 'px';
         orbit.style.left = CenterX - radius + 'px';
@@ -126,6 +199,7 @@ function GenerateOrbits() {
         const index = (i < 4) ? i : i + 1;
         const percentage = index / NumOrbits;
         const radius = MinRadius + percentage * (MaxRadius - MinRadius);
+        Planets[i].dataset.radius = radius * 0.998;
         Planets[i].style.top = CenterY - radius + 'px';
     }
 }
@@ -134,15 +208,18 @@ function RepositionOrbits() {
     let CenterY = window.innerHeight / 2;
     let CenterX = window.innerWidth / 2;
     let orbits = document.querySelectorAll('.orbit');
-    const MinRadius = document.querySelector('.sun').offsetHeight;
-    const MaxRadius = CenterY + 0.05 * CenterY;
+    let MinRadius = document.querySelector('.sun').offsetHeight;
+    let MinAxys = (CenterY <= CenterX) ? CenterY : CenterX;
+    let MaxRadius = MinAxys + 0.05 * MinAxys;
 
     for (let i = 0; i < orbits.length; i++)
     {
         const percentage = i / orbits.length;
         const radius = MinRadius + percentage * (MaxRadius - MinRadius);
-        const orbit = orbits[i];
+        let orbit = orbits[i];
 
+        orbit.style.width = radius * 2 + 'px';
+        orbit.style.height = radius * 2 + 'px';
         orbit.style.left = CenterX - radius + 'px';
         orbit.style.top = CenterY - radius + 'px';
     }
@@ -154,18 +231,39 @@ function FetchPlanetsAndSatellites() {
     for(let i = 0; i < PlanetsWithSatellites.length; i++)
     {
         PlanetsWithSatellites[i].dataset.orbit = OrbitPeriodMultiplier[i];
-        PlanetsWithSatellites[i].dataset.angle = 0;
         let satellites = Array.from(PlanetsWithSatellites[i].children);
+        console.log(satellites);
 
         for(let j = 0; j < satellites.length; j++)
         {
-            satellites[j].dataset.angle = 0;
-            satellites[j].dataset.radius = PlanetsWithSatellites[i].offsetHeight / 2;
+            let radius = PlanetsWithSatellites[i].offsetHeight / 2;
             
             for(let k = 0; k < j; k++)
-                satellites[j].dataset.radius += satellites[k].offsetHeight * 1;
-            
-            //satellites[j].dataset.radius -= satellites[j].offsetHeight / 2;
+                radius += satellites[k].offsetHeight * 1.1;
+
+            satellites[j].dataset.radius = radius;
+        }
+    }
+}
+
+function RepositionPlanetsAndSatellites() {
+    const Sun = document.querySelector('.sun');
+    const CenterX = Sun.offsetLeft;
+    const CenterY = Sun.offsetTop;
+    const orbits = Array.from(document.querySelectorAll('.orbit'));
+    let planets = Array.from(document.querySelectorAll('.solar-object')).slice(1);
+
+    if(TimeSpeed == 0)
+    {
+        for(let i = 0; i < orbits.length - 1; i++)
+        {
+            const index = (i < 4) ? i : i + 1;
+            planets[i].dataset.radius = orbits[index].radius * 0.998;
+
+            const x = CenterX + planets[i].dataset.radius * Math.cos(planets[i].dataset.angle);
+            const y = CenterY + planets[i].dataset.radius * Math.sin(planets[i].dataset.angle);
+            planets[i].style.left = x + 'px';
+            planets[i].style.top = y + 'px';
         }
     }
 }
@@ -177,11 +275,11 @@ function DistanceBetween(ObjectA, ObjectB) {
 }
 
 function OrbitAround(CenterOrbit, OrbitingObject, OrbitTime = 1, InitialAngle = 0, radius = 50){
+    let Time = null;
     const FrameDelta = (1/60).toFixed(4);
     const AngularVelocity = ((2 * Math.PI) / OrbitTime) * TimeSpeed;
     let angle = InitialAngle * (Math.PI / 180);
     OrbitingObject.dataset.angle = InitialAngle * (Math.PI / 180);
-    console.log(OrbitingObject.dataset.angle);
     let CenterX = CenterOrbit.offsetLeft;
     let CenterY = CenterOrbit.offsetTop;
     let x = CenterX + radius * Math.cos(angle);
@@ -191,7 +289,7 @@ function OrbitAround(CenterOrbit, OrbitingObject, OrbitTime = 1, InitialAngle = 
 
     if(TimeSpeed != 0)
     {
-        setInterval(() => 
+        Time = setInterval(() => 
         {
             CenterX = CenterOrbit.offsetLeft;
             CenterY = CenterOrbit.offsetTop;
@@ -202,6 +300,10 @@ function OrbitAround(CenterOrbit, OrbitingObject, OrbitTime = 1, InitialAngle = 
             angle += AngularVelocity * FrameDelta;
             OrbitingObject.dataset.angle = angle;
         }, Math.floor(FrameDelta * 1000));
+    }
+    else
+    {
+        clearInterval(Time);
     }
 }
 
@@ -218,15 +320,15 @@ function TimeFlow() {
 
         OrbitAround(Sun, planets[i], OrbitTime, InitialAngle, DistanceRadius);
 
-        for(let j = 0; j < satellites.length; j++)
-        {
-            let SatelliteClass = Array.from(satellites[j])[0];
-            let SatelliteOrbitTime = OrbitTime * SatelliteOrbits[SatelliteClass];
-            let SatelliteAngle = (RandomPosition) ?  Math.random() * 360 : 0;
-            let SatelliteDistanceRadius = satellites[j].dataset.radius;
+        // for(let j = 0; j < satellites.length; j++)
+        // {
+        //     let SatelliteClass = Array.from(satellites[j])[0];
+        //     let SatelliteOrbitTime = OrbitTime * SatelliteOrbits[SatelliteClass];
+        //     let SatelliteAngle = (RandomPosition) ?  Math.random() * 360 : 0;
+        //     let SatelliteDistanceRadius = satellites[j].dataset.radius;
 
-            OrbitAround(planets[i], satellites[j], SatelliteOrbitTime, SatelliteAngle, SatelliteDistanceRadius);
-        }
+        //     OrbitAround(planets[i], satellites[j], SatelliteOrbitTime, SatelliteAngle, SatelliteDistanceRadius);
+        // }
     }
 }   
 
@@ -237,7 +339,7 @@ function()
     GenerateStarDots();
     GenerateOrbits();
     GenerateAsteroidsBelt();
-    TimeFlow();
+    //TimeFlow();
 });
 
 window.addEventListener('resize', 
@@ -245,4 +347,5 @@ function()
 {
     RepositionOrbits();
     RepositionAsteroids();
+    RepositionPlanetsAndSatellites();
 });
