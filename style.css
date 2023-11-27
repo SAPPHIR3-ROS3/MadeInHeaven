@@ -103,7 +103,7 @@ body
 .sun
 {
     width: 60px;
-    background: url('media/sun.png') center center/cover no-repeat;
+    background: url('media/images/sun.png') center center/cover no-repeat;
     left: 50%;
     top: 50%;
     box-shadow: 0 0 10px 10px rgba(230, 96, 0, 0.7);
@@ -112,21 +112,21 @@ body
 .mercury
 {
     width: 10px;
-    background: url('media/mercury.png') center center/cover no-repeat;
+    background: url('media/images/mercury.png') center center/cover no-repeat;
     left: 50%;
 }
 
 .venus
 {
     width: 20px;
-    background: url('media/venus.png') center center/cover no-repeat;
+    background: url('media/images/venus.png') center center/cover no-repeat;
     left: 50%;
 }
 
 .earth
 {
     width: 21px;
-    background: url('media/earth.png') center center/cover no-repeat;
+    background: url('media/images/earth.png') center center/cover no-repeat;
     left: 50%;
 }
 
@@ -134,32 +134,32 @@ body
 {
     width: 7px;
     border-radius: 50%;
-    background: url('media/moon.png') center center/cover no-repeat;
+    background: url('media/images/moon.png') center center/cover no-repeat;
 }
 
 .mars
 {
     width: 15px;
-    background: url('media/mars.png') center center/cover no-repeat;
+    background: url('media/images/mars.png') center center/cover no-repeat;
     left: 50%;
 }
 
 .phobos
 {
     width: 7px;
-    background: url('media/phobos.png') center center/cover no-repeat;
+    background: url('media/images/phobos.png') center center/cover no-repeat;
 }
 
 .deimos
 {
     width: 5px;
-    background: url('media/deimos.png') center center/cover no-repeat;
+    background: url('media/images/deimos.png') center center/cover no-repeat;
 }
 
 .jupiter
 {
     width: 40px;
-    background: url('media/jupiter.png') center center/cover no-repeat;
+    background: url('media/images/jupiter.png') center center/cover no-repeat;
     left: 50%;
 }
 
@@ -167,34 +167,34 @@ body
 {
     width: 10px;
     border-radius: 50%;
-    background: url('media/io.png') center center/cover no-repeat;
+    background: url('media/images/io.png') center center/cover no-repeat;
 }
 
 .europa
 {
     width: 9px;
     border-radius: 50%;
-    background: url('media/europa.png') center center/cover no-repeat;
+    background: url('media/images/europa.png') center center/cover no-repeat;
 }
 
 .ganymede
 {
     width: 15px;
     border-radius: 50%;
-    background: url('media/ganymede.png') center center/cover no-repeat;
+    background: url('media/images/ganymede.png') center center/cover no-repeat;
 }
 
 .callisto
 {
     width: 12px;
     border-radius: 50%;
-    background: url('media/callisto.png') center center/cover no-repeat;
+    background: url('media/images/callisto.png') center center/cover no-repeat;
 }
 
 .saturn
 {
     width: 38px;
-    background: url('media/saturn.png') center center/cover no-repeat;
+    background: url('media/images/saturn.png') center center/cover no-repeat;
     left: 50%; 
 }
 
@@ -232,20 +232,20 @@ body
 {
     width: 15px;
     border-radius: 50%;
-    background: url('media/titan.png') center center/cover no-repeat;
+    background: url('media/images/titan.png') center center/cover no-repeat;
 }
 
 .rhea
 {
     width: 5px;
     border-radius: 50%;
-    background: url('media/titan.png') center center/cover no-repeat;
+    background: url('media/images/rhea.png') center center/cover no-repeat;
 }
 
 .uranus
 {
     width:30px;
-    background: url('media/uranus.png') center center/cover no-repeat;
+    background: url('media/images/uranus.png') center center/cover no-repeat;
     left: 50%;
 }
 
@@ -253,20 +253,20 @@ body
 {
     width: 7px;
     border-radius: 50%;
-    background: url('media/titania.png') center center/cover no-repeat;
+    background: url('media/images/titania.png') center center/cover no-repeat;
 }
 
 .oberon
 {
     width: 7px;
     border-radius: 50%;
-    background: url('media/oberon.png') center center/cover no-repeat;
+    background: url('media/images/oberon.png') center center/cover no-repeat;
 }
 
 .neptune
 {
     width:29px;
-    background: url('media/neptune.png') center center/cover no-repeat;
+    background: url('media/images/neptune.png') center center/cover no-repeat;
     left: 50%;
 }
 
@@ -274,20 +274,20 @@ body
 {
     width: 5px;
     border-radius: 50%;
-    background: url('media/nereide.png') center center/cover no-repeat;
+    background: url('media/images/nereide.png') center center/cover no-repeat;
 }
 
 .proteus
 {
     width: 5px;
     border-radius: 50%;
-    background: url('media/proteus.png') center center/cover no-repeat;
+    background: url('media/images/proteus.png') center center/cover no-repeat;
 }
 
 .pluto
 {
     width:8px;
-    background: url('media/pluto.png') center center/cover no-repeat;
+    background: url('media/images/pluto.png') center center/cover no-repeat;
     left: 50%;
 }
 
@@ -295,5 +295,5 @@ body
 {
     width: 7px;
     border-radius: 50%;
-    background: url('media/charon.png') center center/cover no-repeat;
+    background: url('media/images/charon.png') center center/cover no-repeat;
 }
