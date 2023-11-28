@@ -122,21 +122,18 @@ body
 {
     width: 10px;
     background: url('media/images/mercury.png') center center/cover no-repeat;
-    left: 50%;
 }
 
 .venus
 {
     width: 20px;
     background: url('media/images/venus.png') center center/cover no-repeat;
-    left: 50%;
 }
 
 .earth
 {
     width: 21px;
     background: url('media/images/earth.png') center center/cover no-repeat;
-    left: 50%;
 }
 
 .moon
@@ -150,7 +147,6 @@ body
 {
     width: 15px;
     background: url('media/images/mars.png') center center/cover no-repeat;
-    left: 50%;
 }
 
 .phobos
@@ -169,7 +165,6 @@ body
 {
     width: 40px;
     background: url('media/images/jupiter.png') center center/cover no-repeat;
-    left: 50%;
 }
 
 .io
@@ -204,7 +199,6 @@ body
 {
     width: 38px;
     background: url('media/images/saturn.png') center center/cover no-repeat;
-    left: 50%; 
 }
 
 .saturn::before
@@ -255,7 +249,6 @@ body
 {
     width:30px;
     background: url('media/images/uranus.png') center center/cover no-repeat;
-    left: 50%;
 }
 
 .titania
@@ -276,7 +269,6 @@ body
 {
     width:29px;
     background: url('media/images/neptune.png') center center/cover no-repeat;
-    left: 50%;
 }
 
 .nereide
@@ -297,10 +289,9 @@ body
 {
     width:8px;
     background: url('media/images/pluto.png') center center/cover no-repeat;
-    left: 50%;
 }
 
-.proteus
+.charon
 {
     width: 7px;
     border-radius: 50%;
