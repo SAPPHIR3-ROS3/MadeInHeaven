@@ -28,6 +28,16 @@ body
     z-index: 32;
     visibility: hidden;
 }
+.center
+{
+  aspect-ratio: 1/1;
+  width:1px;
+  position:absolute;
+  background: rgb(0, 0, 0);
+  left: 50%;
+  top: 50%;
+  z-index: 0;
+}
 
 .test-container
 {
@@ -87,7 +97,6 @@ body
     margin: 0px;
     border-radius: 50%;
     position: absolute;
-    transform: translate(-50%, -50%);
     z-index: 2;
 }
 
@@ -95,8 +104,7 @@ body
 {
     aspect-ratio: 1 / 1;
     margin: 0px;
-    position: absolute;
-    transform: translate(-50%, -50%);
+    position: fixed;
     z-index: 3;
 }
 
@@ -106,6 +114,7 @@ body
     background: url('media/images/sun.png') center center/cover no-repeat;
     left: 50%;
     top: 50%;
+    transform: translate(-50%, -50%);
     box-shadow: 0 0 10px 10px rgba(230, 96, 0, 0.7);
 }
 
