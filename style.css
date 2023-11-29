@@ -155,28 +155,28 @@ body
 
 .io
 {
-    width: 5px;
+    width: 4px;
     border-radius: 50%;
     background: url('media/images/io.png') center center/cover no-repeat;
 }
 
 .europa
 {
-    width: 4px;
+    width: 3px;
     border-radius: 50%;
     background: url('media/images/europa.png') center center/cover no-repeat;
 }
 
 .ganymede
 {
-    width: 7px;
+    width: 6px;
     border-radius: 50%;
     background: url('media/images/ganymede.png') center center/cover no-repeat;
 }
 
 .callisto
 {
-    width: 6px;
+    width: 5px;
     border-radius: 50%;
     background: url('media/images/callisto.png') center center/cover no-repeat;
 }
