@@ -176,9 +176,18 @@ function GenerateOrbits() {
     }
 
     document.body.appendChild(Orbits);
-} 
+}
+
+function DistanceBetween(ObjectA, ObjectB) {
+    const x = ObjectA.offsetLeft - ObjectB.offsetLeft;
+    const y = ObjectA.offsetTop - ObjectB.offsetTop;
+    return Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
+}
 
 function FetchPlanetsAndSatellites() {
+    let CenterY = window.innerHeight / 2;
+    let CenterX = window.innerWidth / 2;
+    let MinAxys = (CenterY <= CenterX) ? CenterY : CenterX;
     const Sun = document.querySelector('.center');
     const orbits = Array.from(document.querySelectorAll('.orbit'));
     let planets = Array.from(document.querySelectorAll('.solar-object')).slice(1);
@@ -192,7 +201,8 @@ function FetchPlanetsAndSatellites() {
         let y = Sun.offsetTop - planets[index].offsetHeight / 2;
         planets[index].style.left = `${x}px`;
         planets[index].style.top = `${y}px`;
-        console.log(i, planets[index].style.left, planets[index].style.top, planets[index].offsetWidth);
+        let distance = DistanceBetween(Sun, planets[index]) / MinAxys;
+        planets[index].dataset.RadiusPercentage = distance;
         let satellites = Array.from(planets[index].children);
         
         for(let j = 0; j < satellites.length; j++)
@@ -203,19 +213,14 @@ function FetchPlanetsAndSatellites() {
             for(let k = 0; k < j; k++)
                 y += satellites[k].offsetHeight + 3;
 
+            
             satellites[j].style.left = `${x}px`;
             satellites[j].style.top = `${y}px`;
-            console.log(i, j, satellites[j].style.left, satellites[j].style.top, satellites[j].offsetWidth);
-
+            distance = DistanceBetween(planets[index], satellites[j]) / MinAxys;
+            
+            satellites[j].dataset.RadiusPercentage = distance;
         }
     }
-}
-
-
-function DistanceBetween(ObjectA, ObjectB) {
-    const x = ObjectA.offsetLeft - ObjectB.offsetLeft;
-    const y = ObjectA.offsetTop - ObjectB.offsetTop;
-    return Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
 }
 
 function OrbitAround(center, OrbitingObject, radius, angle = 0, OrbitTime = 1) {
