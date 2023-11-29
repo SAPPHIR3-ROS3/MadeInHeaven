@@ -39,20 +39,6 @@ body
   z-index: 0;
 }
 
-.test-container
-{
-    aspect-ratio: 1/1;
-    border-radius: 50%;
-    position: absolute;
-    top:50%;
-    left:50%;
-    width:20%;
-    background-color: cyan;
-    transform: translate(-50%, -50%); 
-    z-index: 5;
-    visibility: hidden;
-}
-
 .ring 
 {
     border-radius: 50%;
