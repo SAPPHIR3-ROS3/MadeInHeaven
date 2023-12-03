@@ -1,25 +1,25 @@
-var OrbitPeriodMultiplier = [1/3, 2/3, 3/3 , 4/3, 6/3, 7/3, 8/3, 9/3, 10/3];
-var SatelliteOrbits = 
+let OrbitPeriodMultiplier = [1/3, 2/3, 3/3 , 4/3, 6/3, 7/3, 8/3, 9/3, 10/3];
+let SatelliteOrbits = 
 {
-    '.moon': 1/13, 
-    '.phobos': 1/212, 
-    '.deimos': 1/53, 
-    '.io': 1/24, 
-    '.europa': 1/12, 
-    '.ganymede': 1/6, 
-    '.callisto': 1/2, 
-    '.titan': 1/67, 
-    '.rhea': 1/24,
-    '.titania': 1/350,
-    '.oberon': 1/228,
-    '.proteus': 1/538,
-    '.nereide': 1/2,
-    '.charon': 1/142
+    'moon': 1/13, 
+    'phobos': 1/21, 
+    'deimos': 1/5, 
+    'io': 1/24, 
+    'europa': 1/12, 
+    'ganymede': 1/6, 
+    'callisto': 1/2, 
+    'titan': 1/67, 
+    'rhea': 1/24,
+    'titania': 1/35,
+    'oberon': 1/22,
+    'proteus': 1/53,
+    'nereide': 1/2,
+    'charon': 1/142
 };
-var EarthYear = 60;
-var PreviousTimeSpeed = 0;
-var TimeSpeed = 1;
-var RandomPosition = false;
+let EarthYear = 60;
+let PreviousTimeSpeed = 0;
+let TimeSpeed = 1;
+let RandomPosition = true;
 
 function ToggleBWFilter(seconds, SecondsDelay = 0) {
     function BWPercentage(gray) {document.body.style.filter = `grayscale(${gray}%)`;}
@@ -185,40 +185,30 @@ function DistanceBetween(ObjectA, ObjectB) {
 }
 
 function FetchPlanetsAndSatellites() {
-    let CenterY = window.innerHeight / 2;
-    let CenterX = window.innerWidth / 2;
-    let MinAxys = (CenterY <= CenterX) ? CenterY : CenterX;
-    const Sun = document.querySelector('.center');
-    const orbits = Array.from(document.querySelectorAll('.orbit'));
+    let orbits = Array.from(document.querySelectorAll('.orbit'));
+    let Sun = document.querySelector('.center');
     let planets = Array.from(document.querySelectorAll('.solar-object')).slice(1);
-    console.log(Sun.offsetLeft);
-    console.log(' ')
-
+    
     for(let i = 0; i < orbits.length; i++)
-    {   
+    {
         let index = (i < 5) ? i : i - 1;
-        let x = Sun.offsetLeft + Number(orbits[i].dataset.radius) - planets[index].offsetWidth / 2;
-        let y = Sun.offsetTop - planets[index].offsetHeight / 2;
-        planets[index].style.left = `${x}px`;
-        planets[index].style.top = `${y}px`;
-        let distance = DistanceBetween(Sun, planets[index]) / MinAxys;
-        planets[index].dataset.RadiusPercentage = distance;
+        planets[index].dataset.radius = orbits[i].dataset.radius;
+        planets[index].dataset.angle = (RandomPosition) ? Math.random() * 359 : 0;
+        let orbit = EarthYear * OrbitPeriodMultiplier[index];
         let satellites = Array.from(planets[index].children);
+        OrbitAround(Sun, planets[index], Number(planets[index].dataset.radius), Number(planets[index].dataset.angle), orbit);
         
         for(let j = 0; j < satellites.length; j++)
         {
-            x = planets[index].offsetLeft + planets[index].offsetWidth / 2 - satellites[j].offsetWidth / 2;
-            y = planets[index].offsetTop + planets[index].offsetHeight + 5;
-
+            let radius = 0;
             for(let k = 0; k < j; k++)
-                y += satellites[k].offsetHeight + 3;
-
+                radius += satellites[k].offsetHeight;
             
-            satellites[j].style.left = `${x}px`;
-            satellites[j].style.top = `${y}px`;
-            distance = DistanceBetween(planets[index], satellites[j]) / MinAxys;
-            
-            satellites[j].dataset.RadiusPercentage = distance;
+            radius += planets[index].offsetHeight;
+            satellites[j].dataset.radius = radius;
+            satellites[j].dataset.angle = (RandomPosition) ? Math.random() * 359 : 0;
+            let SatelliteOrbit = EarthYear * OrbitPeriodMultiplier[index] * SatelliteOrbits[satellites[j].classList[0]];
+            OrbitAround(planets[index], satellites[j], Number(satellites[j].dataset.radius), Number(satellites[j].dataset.angle), SatelliteOrbit);
         }
     }
 }
@@ -251,12 +241,7 @@ function OrbitAround(center, OrbitingObject, radius, angle = 0, OrbitTime = 1) {
   
     frame();
 }
-
-
-function TimeFlow() {
-    
-} 
-  
+ 
 
 document.addEventListener('DOMContentLoaded', 
 function()
