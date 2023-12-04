@@ -20,6 +20,7 @@ let EarthYear = 60;
 let PreviousTimeSpeed = 0;
 let TimeSpeed = 1;
 let RandomPosition = true;
+let ZaWarudoIsRunning = false;
 
 function ToggleBWFilter(seconds, SecondsDelay = 0) {
     function BWPercentage(gray) {document.body.style.filter = `grayscale(${gray}%)`;}
@@ -67,25 +68,32 @@ function ManageRing(seconds, SecondsDelay) {
 }
   
 function ZaWarudo() {
-    if(TimeSpeed != 0)
-    { 
-        PreviousTimeSpeed = TimeSpeed;
-        TimeSpeed = 0;
-        let TheWorld = new Audio('media/audio/Star Platinum The World Start.mp3')
-        TheWorld.play();
-        ToggleBWFilter(4, 2);
-        ManageRing(5, 2);
-    }
-    else
+    if(!ZaWarudoIsRunning)
     {
-        TimeSpeed = PreviousTimeSpeed;
-        PreviousTimeSpeed = 0;
-        let TheWorld = new Audio('media/audio/Star Platinum The World End.mp3')
-        TheWorld.play();
-        ToggleBWFilter(2);
-        ManageRing(2);
+        ZaWarudoIsRunning = true;
+        setTimeout(() => 
+        {
+            ZaWarudoIsRunning = false;
+        }, 8 * 1000);
+        if(TimeSpeed != 0)
+        { 
+            PreviousTimeSpeed = TimeSpeed;
+            TimeSpeed = 0;
+            let TheWorld = new Audio('media/audio/Star Platinum The World Start.mp3')
+            TheWorld.play();
+            ToggleBWFilter(4, 2);
+            ManageRing(5, 2);
+        }
+        else
+        {
+            TimeSpeed = PreviousTimeSpeed;
+            PreviousTimeSpeed = 0;
+            let TheWorld = new Audio('media/audio/Star Platinum The World End.mp3')
+            TheWorld.play();
+            ToggleBWFilter(2);
+            ManageRing(2);
+        }
     }
-  
 }
 
 function GenerateStarDots() {
@@ -130,6 +138,7 @@ function GenerateAsteroidsBelt() {
 
         asteroid.dataset.angle = (i / asteroids) * 2 * Math.PI;
         asteroid.dataset.radius = InnerRadius + (OuterRadius - InnerRadius) * Math.random();
+        asteroid.dataset.RadiusPercentage = Number(asteroid.dataset.radius) / MinAxys;
         asteroid.dataset.RadiusPercentage = asteroid.dataset.radius / MinAxys;
         const x = Math.cos(asteroid.dataset.angle) * asteroid.dataset.radius;
         const y = Math.sin(asteroid.dataset.angle) * asteroid.dataset.radius;
@@ -213,6 +222,20 @@ function FetchPlanetsAndSatellites() {
     }
 }
 
+function AsteroidsBeltSpin()
+{
+    let Sun = document.querySelector('.center');
+    let asteroids = Array.from(document.querySelectorAll('.asteroids-belt-rock'));
+    let OrbitTime = 5/3 * EarthYear;
+    //console.log(OrbitTime);
+
+    for(let i = 0; i < asteroids.length; i++)
+    {
+        //console.log(Sun, asteroids[i], Number(asteroids[i].dataset.radius), Number(asteroids[i].dataset.angle), OrbitTime);
+        //OrbitAround(Sun, asteroids[i], Number(asteroids[i].dataset.radius), Number(asteroids[i].dataset.angle), OrbitTime);
+    }
+}
+
 function OrbitAround(center, OrbitingObject, radius, angle = 0, OrbitTime = 1) {
     let radian = angle * Math.PI / 180;
     const AngleIncrement = (2 * Math.PI) / (60 * OrbitTime);
@@ -241,7 +264,7 @@ function OrbitAround(center, OrbitingObject, radius, angle = 0, OrbitTime = 1) {
   
     frame();
 }
- 
+
 
 document.addEventListener('DOMContentLoaded', 
 function()
@@ -250,6 +273,7 @@ function()
     GenerateOrbits();
     GenerateAsteroidsBelt();
     FetchPlanetsAndSatellites();
+    // AsteroidsBeltSpin();
 });
 
 window.addEventListener('resize', 
