@@ -74,7 +74,7 @@ function ZaWarudo() {
         setTimeout(() => 
         {
             ZaWarudoIsRunning = false;
-        }, 8 * 1000);
+        }, 5 * 1000);
         if(TimeSpeed != 0)
         { 
             PreviousTimeSpeed = TimeSpeed;
@@ -139,7 +139,6 @@ function GenerateAsteroidsBelt() {
         asteroid.dataset.angle = (i / asteroids) * 2 * Math.PI;
         asteroid.dataset.radius = InnerRadius + (OuterRadius - InnerRadius) * Math.random();
         asteroid.dataset.RadiusPercentage = Number(asteroid.dataset.radius) / MinAxys;
-        asteroid.dataset.RadiusPercentage = asteroid.dataset.radius / MinAxys;
         const x = Math.cos(asteroid.dataset.angle) * asteroid.dataset.radius;
         const y = Math.sin(asteroid.dataset.angle) * asteroid.dataset.radius;
 
@@ -265,6 +264,45 @@ function OrbitAround(center, OrbitingObject, radius, angle = 0, OrbitTime = 1) {
     frame();
 }
 
+function RepositionOrbits()
+{
+    let orbits = Array.from(document.querySelectorAll('.orbit'));
+    let CenterY = window.innerHeight / 2;
+    let CenterX = window.innerWidth / 2;
+    const MinRadius = document.querySelector('.sun').offsetHeight;
+    const MaxRadius = CenterY + 0.05 * CenterY;
+    
+    for(let i = 0; i < orbits.length; i++)
+    {
+        const percentage = i / orbits.length;
+        const radius = MinRadius + percentage * (MaxRadius - MinRadius);
+        orbits[i].dataset.radius = radius;
+        orbits[i].style.width = radius * 2 + 'px';
+        orbits[i].style.height = radius * 2 + 'px';
+        orbits[i].style.left = CenterX - radius + 'px';
+        orbits[i].style.top = CenterY - radius + 'px';
+    }
+}
+
+function RepositionAsteroids()
+{
+    let asteroids = Array.from(document.querySelectorAll('.asteroids-belt-rock'));
+    let CenterY = window.innerHeight / 2;
+    let CenterX = window.innerWidth / 2;
+    let MinAxys = (CenterY <= CenterX) ? CenterY : CenterX;
+    let OrbitRadius = document.querySelectorAll('.orbit')[4]
+    OrbitRadius = Number((OrbitRadius.dataset.radius / MinAxys).toFixed(3));
+
+    for(let i = 0; i < asteroids.length; i++)
+    {
+        asteroids[i].dataset.radius = asteroids[i].dataset.RadiusPercentage * MinAxys;
+        const x = Math.cos(asteroids[i].dataset.angle) * asteroids[i].dataset.radius;
+        const y = Math.sin(asteroids[i].dataset.angle) * asteroids[i].dataset.radius;
+        const size = asteroids[i].offsetHeight; 
+        asteroids[i].style.left = CenterX + x - size + 'px';
+        asteroids[i].style.top = CenterY + y - size + 'px';
+    }
+}
 
 document.addEventListener('DOMContentLoaded', 
 function()
@@ -279,5 +317,6 @@ function()
 window.addEventListener('resize', 
 function()
 {
-
+    RepositionOrbits();
+    RepositionAsteroids();
 });
