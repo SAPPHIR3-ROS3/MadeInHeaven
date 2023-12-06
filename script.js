@@ -90,7 +90,7 @@ function ZaWarudo() {
             PreviousTimeSpeed = 0;
             let TheWorld = new Audio('media/audio/Star Platinum The World End.mp3')
             TheWorld.play();
-            ToggleBWFilter(2);
+            ToggleBWFilter(3);
             ManageRing(2);
         }
     }
