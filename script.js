@@ -96,6 +96,34 @@ function ZaWarudo() {
     }
 }
 
+function Clock() {
+    let Timestamp = new Date();
+    let HoursDeg = ((Timestamp.getHours() % 12) / 12) * 360;
+    let MinutesDeg = (Timestamp.getMinutes() / 60) * 360;
+    let HoursHand = document.querySelector('.hours-hand');
+    let MinutesHand = document.querySelector('.minutes-hand');
+    const AngleIncrement = (2 * Math.PI) / (60 * EarthYear);
+
+    HoursHand.style.transform = `rotate(${HoursDeg}deg)`;
+    MinutesHand.style.transform = `rotate(${MinutesDeg}deg)`;
+
+    function updateClockPosition() {
+        if (TimeSpeed !== 0) {
+            HoursDeg = HoursDeg + (AngleIncrement * TimeSpeed * 1 / 12);
+            MinutesDeg = MinutesDeg + (AngleIncrement * TimeSpeed);
+            HoursHand.style.transform = `rotate(${HoursDeg}deg)`;
+            MinutesHand.style.transform = `rotate(${MinutesDeg}deg)`;
+        }
+    }
+
+    function ClockFrame() {
+        updateClockPosition();
+        requestAnimationFrame(ClockFrame);
+    }
+
+    ClockFrame();
+}
+
 function GenerateStarDots() {
     const Space = document.createElement('div');
     Space.classList.add('space');

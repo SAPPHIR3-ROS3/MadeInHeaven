@@ -48,6 +48,40 @@ body
     z-index: 4;
 }
 
+.watchface {
+    aspect-ratio: 1/1;
+    position: absolute;
+    width: 130vh;
+    background: url('../media/images/watchface.svg') center center/cover no-repeat;
+    opacity: 50%;
+    z-index: 10;
+    visibility: hidden;
+}
+
+.minutes-hand {
+    aspect-ratio: 1/1;
+    position: absolute;
+    width: 130vh;
+    background: url('../media/images/minutes.svg') center center/cover no-repeat;
+    opacity: 50%;
+    z-index: 11;
+    transform-origin: center;
+    transform: rotate(0deg);
+    visibility: hidden;
+}
+
+.hours-hand {
+    aspect-ratio: 1/1;
+    position: absolute;
+    width: 130vh;
+    background: url('../media/images/hours.svg') center center/cover no-repeat;
+    opacity: 50%;
+    z-index: 12;
+    transform-origin: center;
+    transform: rotate(0deg);
+    visibility: hidden;
+}
+
 .star-dot{
     aspect-ratio: 1/1;
     position: absolute;
