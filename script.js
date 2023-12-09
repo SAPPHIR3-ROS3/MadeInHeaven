@@ -66,6 +66,36 @@ function ManageRing(seconds, SecondsDelay) {
       setTimeout(() => {ring.remove();}, seconds * 1000);
     }
 }
+
+function DaylightCycle() {
+    let btw = document.querySelector('.night-to-day');
+    let wtb = document.querySelector('.day-to-night');
+
+    function ScrollDaylight() {
+        // Get current position as a percentage
+        let btwLeft = btw.offsetLeft / window.innerWidth * 100 + 1 * Math.log10(TimeSpeed);
+        let wtbLeft = wtb.offsetLeft / window.innerWidth * 100 + 1 * Math.log10(TimeSpeed);
+
+        console.log(btwLeft, wtbLeft);
+
+        // If a div is completely out of view, reset it to the left of the other div
+        if (btwLeft > 100)
+            btwLeft -= 200;
+
+        if (wtbLeft > 100)
+            wtbLeft -= 200;
+
+        btw.style.left = `${btwLeft}%`;
+        wtb.style.left = `${wtbLeft}%`;
+    }
+
+    function DayNight() {
+        ScrollDaylight();
+        requestAnimationFrame(DayNight);
+    }
+
+    DayNight();
+}
   
 function ZaWarudo() {
     if(!ZaWarudoIsRunning)
