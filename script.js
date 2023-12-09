@@ -322,6 +322,40 @@ function OrbitAround(center, OrbitingObject, radius, angle = 0, OrbitTime = 1) {
     frame();
 }
 
+function SpiralAround(object, loops, duration, initialAngle) {
+    let startTime = null;
+    let centerX = window.innerWidth / 2;
+    let centerY = window.innerHeight / 2;
+    let objectCenterX = object.offsetLeft + object.offsetWidth / 2;
+    let objectCenterY = object.offsetTop + object.offsetHeight / 2;
+    let initialRadius = Math.sqrt(Math.pow(centerX - objectCenterX, 2) + Math.pow(centerY - objectCenterY, 2));
+    initialAngle = initialAngle * Math.PI / 180; // convert to radians
+
+    function spiralMovement() {
+        let currentTime = performance.now();
+        if (!startTime) startTime = currentTime;
+        let elapsed = (currentTime - startTime) / 1000; // convert to seconds
+        let angle = initialAngle + Math.min(1, (elapsed / duration)) * 2 * Math.PI * loops;
+        let radius = initialRadius * (1 - Math.min(1, elapsed / duration));
+        let x = centerX + radius * Math.cos(angle) - object.offsetWidth / 2;
+        let y = centerY + radius * Math.sin(angle) - object.offsetHeight / 2;
+        object.style.left = x + 'px';
+        object.style.top = y + 'px';
+    }
+
+    function animationControl() {
+        if ((performance.now() - startTime) / 1000 < duration) { // convert to seconds
+            spiralMovement();
+            requestAnimationFrame(animationControl);
+        } else {
+            object.style.left = (centerX - object.offsetWidth / 2) + 'px';
+            object.style.top = (centerY - object.offsetHeight / 2) + 'px';
+        }
+    }
+
+    animationControl();
+}
+
 function RepositionOrbits()
 {
     let orbits = Array.from(document.querySelectorAll('.orbit'));
