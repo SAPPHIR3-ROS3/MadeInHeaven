@@ -7,7 +7,7 @@ let SatelliteOrbits =
     'io': 1/24, 
     'europa': 1/12, 
     'ganymede': 1/6, 
-    'callisto': 1/2, 
+    'callisto': 1/4, 
     'titan': 1/67, 
     'rhea': 1/24,
     'titania': 1/35,
