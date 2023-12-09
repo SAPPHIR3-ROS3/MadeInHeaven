@@ -28,6 +28,7 @@ body
     z-index: 32;
     visibility: hidden;
 }
+
 .center
 {
   aspect-ratio: 1/1;
