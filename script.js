@@ -73,7 +73,7 @@ function ManageRing(seconds, SecondsDelay) {
 
 function Clock(seconds) {
     let FadeTime = seconds / 12;
-    let exponent = 4.4;
+    let exponent = 4.1;
     let StartTime = performance.now();
     let Timestamp = new Date();
     let HoursDeg = ((Timestamp.getHours() % 12) / 12) * 360;
@@ -117,10 +117,7 @@ function Clock(seconds) {
         }
         else
         {
-            for(let opacity = 0; opacity < 51; opacity++)
-                setTimeout(() => {ClockOpacity((50 - opacity)/100);}, opacity * FadeTime * 10);
-            
-            setTimeout(() => {document.body.removeChild(Watch)}, FadeTime * 1000 + 1);
+            document.body.removeChild(Watch);
         }
     }
 
@@ -131,6 +128,7 @@ function Clock(seconds) {
 }
 
 function DaylightCycle(seconds) {
+    let exponent = 2;
     let StartTime = performance.now();
     let btw = document.createElement('div');
     btw.classList.add('night-to-day');
@@ -140,8 +138,8 @@ function DaylightCycle(seconds) {
     document.body.appendChild(wtb);
 
     function ScrollDaylight() {
-        let btwLeft = btw.offsetLeft / window.innerWidth * 100 + 1 * Math.log(TimeSpeed);
-        let wtbLeft = wtb.offsetLeft / window.innerWidth * 100 + 1 * Math.log(TimeSpeed);
+        let btwLeft = btw.offsetLeft / window.innerWidth * 100 + 1 * Math.log(TimeSpeed) * exponent;
+        let wtbLeft = wtb.offsetLeft / window.innerWidth * 100 + 1 * Math.log(TimeSpeed) * exponent;
 
         if (btwLeft > 100)
             btwLeft -= 200;
@@ -203,7 +201,9 @@ function MadeInHeaven() {
      if(!MadeInHeavenPhase1)
      {
         MadeInHeavenPhase1 = true;
-        let MaxSpeed = 2901;
+        let SpeedPhase1 = 2901;
+        let SpeedPhase2 = 6501;
+        let SpeedPhase3 = 2**19;
 
         let MadeInHeavenText = document.createElement('div');
         MadeInHeavenText.id = 'MadeInHeaven';
@@ -214,8 +214,8 @@ function MadeInHeaven() {
 
         setTimeout(() =>
         {
-            for(let i = 0; i < MaxSpeed; i++)
-                setTimeout(() => {TimeSpeed = 1+i/100;}, i);
+            for(let i = 0; i < SpeedPhase1; i++)
+                setTimeout(() => {TimeSpeed = 1+i/100;}, i/SpeedPhase1 * SpeedPhase1);
             
         }, 17 * 1000);
         setTimeout(() =>
@@ -223,18 +223,28 @@ function MadeInHeaven() {
             let MadeInHeavenAudio = new Audio('./media/audio/MadeInHeaven.mp3');
             MadeInHeavenAudio.play();
             document.body.appendChild(MadeInHeavenText);
-            MadeInHeavenPhase1 = false;
         }, 16 * 1000);
         setTimeout(() =>
         {
-            Clock(15);
+            for(let i = SpeedPhase1 + 99; i < SpeedPhase2; i++)
+                setTimeout(() => {TimeSpeed = i/100;}, (i - SpeedPhase1 - 99)/(SpeedPhase2 - SpeedPhase1) * 49 * 1000);
+
+            Clock(49);
             document.body.removeChild(MadeInHeavenText);
         }, 21 * 1000);
         setTimeout(() =>
         {
-            DaylightCycle(14);
-        }, 36 * 1000);
-        setTimeout(() => {Crucified.pause();}, 50 * 1000);
+            for(let i = SpeedPhase2 - 1; i < SpeedPhase3; i++)
+                setTimeout(() => {TimeSpeed = i/100;}, (i - SpeedPhase2 + 1)/(SpeedPhase3 - SpeedPhase2) * 56 * 1000);
+
+            DaylightCycle(56);
+            MadeInHeavenPhase1 = false;
+        }, 70 * 1000);
+        setTimeout(() =>
+        {
+
+        },126.5 * 1000)
+        setTimeout(() => {Crucified.pause();}, 126.5 * 1000);
      }
 }
 
