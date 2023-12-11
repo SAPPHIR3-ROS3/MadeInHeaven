@@ -20,6 +20,9 @@ let EarthYear = 60;
 let PreviousTimeSpeed = 0;
 let TimeSpeed = 1;
 let RandomPosition = true;
+let MadeInHeavenPhase1 = false;
+let MadeInHeavenPhase2 = false;
+let MadeInHeavenPhase3 = false;
 let ZaWarudoIsRunning = false;
 
 function ToggleBWFilter(seconds, SecondsDelay = 0) {
@@ -33,17 +36,18 @@ function ToggleBWFilter(seconds, SecondsDelay = 0) {
     else
     {
         for(let gray = 0; gray < 101; gray++)
-            setTimeout(() => {BWPercentage(100 - gray);}, SecondsDelay * 1000 + gray * (seconds - SecondsDelay) * 10)
+            setTimeout(() => {BWPercentage(100 - gray);}, SecondsDelay * 1000 + gray * (seconds - SecondsDelay) * 10);
     }
 }
 
 function ManageRing(seconds, SecondsDelay) {
-    const Earth = document.querySelector('.earth');
     const ring = document.createElement('div');
+    let Earth = document.querySelector('.earth');
     ring.classList.add('ring');
     Earth.appendChild(ring);
     
     function change(diameter) {
+        Earth = document.querySelector('.earth');
         diameter *= window.innerWidth / 50;
         ring.style.left = Earth.style.left;
         ring.style.top = Earth.style.top
@@ -67,18 +71,78 @@ function ManageRing(seconds, SecondsDelay) {
     }
 }
 
-function DaylightCycle() {
-    let btw = document.querySelector('.night-to-day');
-    let wtb = document.querySelector('.day-to-night');
+function Clock(seconds) {
+    let FadeTime = seconds / 12;
+    let exponent = 4.4;
+    let StartTime = performance.now();
+    let Timestamp = new Date();
+    let HoursDeg = ((Timestamp.getHours() % 12) / 12) * 360;
+    let MinutesDeg = (Timestamp.getMinutes() / 60) * 360;
+    let Watch = document.createElement('div');
+    Watch.classList.add('watch');
+    let WatchFace = document.createElement('div');
+    WatchFace.classList.add('watchface');
+    let HoursHand = document.createElement('div');
+    HoursHand.classList.add('hours-hand');
+    let MinutesHand = document.createElement('div');
+    MinutesHand.classList.add('minutes-hand');
+    const AngleIncrement = (2 * Math.PI) / (60 * EarthYear);
+    Watch.appendChild(WatchFace);
+    Watch.appendChild(MinutesHand);
+    Watch.appendChild(HoursHand);
+    document.body.appendChild(Watch);
+    HoursHand.style.transform = `rotate(${HoursDeg}deg)`;
+    MinutesHand.style.transform = `rotate(${MinutesDeg}deg)`;
+
+    function ClockOpacity(opacity){
+        WatchFace.style.opacity = opacity;
+        HoursHand.style.opacity = opacity;
+        MinutesHand.style.opacity = opacity;
+    };
+
+    function updateClockPosition() {
+        if (TimeSpeed !== 0) {
+            HoursDeg = HoursDeg + (AngleIncrement * TimeSpeed * 1 / 12 * (Math.log(TimeSpeed))**exponent);
+            MinutesDeg = MinutesDeg + (AngleIncrement * TimeSpeed * (Math.log(TimeSpeed))**exponent);
+            HoursHand.style.transform = `translate(-50%, -50%) rotate(${HoursDeg}deg)`;
+            MinutesHand.style.transform = `translate(-50%, -50%) rotate(${MinutesDeg}deg)`;
+        }
+    }
+
+    function ClockFrame() {
+        if((performance.now() - StartTime) / 1000 < seconds)
+        {
+            updateClockPosition();
+            requestAnimationFrame(ClockFrame);
+        }
+        else
+        {
+            for(let opacity = 0; opacity < 51; opacity++)
+                setTimeout(() => {ClockOpacity((50 - opacity)/100);}, opacity * FadeTime * 10);
+            
+            setTimeout(() => {document.body.removeChild(Watch)}, FadeTime * 1000 + 1);
+        }
+    }
+
+    for(let opacity = 0; opacity < 51; opacity++)
+        setTimeout(() => {ClockOpacity(opacity/100);}, opacity * FadeTime * 10);
+
+    ClockFrame();
+}
+
+function DaylightCycle(seconds) {
+    let StartTime = performance.now();
+    let btw = document.createElement('div');
+    btw.classList.add('night-to-day');
+    let wtb = document.createElement('div');
+    wtb.classList.add('day-to-night');
+    document.body.appendChild(btw);
+    document.body.appendChild(wtb);
 
     function ScrollDaylight() {
-        // Get current position as a percentage
-        let btwLeft = btw.offsetLeft / window.innerWidth * 100 + 1 * Math.log10(TimeSpeed);
-        let wtbLeft = wtb.offsetLeft / window.innerWidth * 100 + 1 * Math.log10(TimeSpeed);
+        let btwLeft = btw.offsetLeft / window.innerWidth * 100 + 1 * Math.log(TimeSpeed);
+        let wtbLeft = wtb.offsetLeft / window.innerWidth * 100 + 1 * Math.log(TimeSpeed);
 
-        console.log(btwLeft, wtbLeft);
-
-        // If a div is completely out of view, reset it to the left of the other div
         if (btwLeft > 100)
             btwLeft -= 200;
 
@@ -90,8 +154,16 @@ function DaylightCycle() {
     }
 
     function DayNight() {
-        ScrollDaylight();
-        requestAnimationFrame(DayNight);
+        if((performance.now() - StartTime) / 1000 < seconds)
+        {
+            ScrollDaylight();
+            requestAnimationFrame(DayNight);
+        }
+        else
+        {
+            document.body.removeChild(btw);
+            document.body.removeChild(wtb);
+        }
     }
 
     DayNight();
@@ -109,7 +181,7 @@ function ZaWarudo() {
         { 
             PreviousTimeSpeed = TimeSpeed;
             TimeSpeed = 0;
-            let TheWorld = new Audio('media/audio/Star Platinum The World Start.mp3')
+            let TheWorld = new Audio('./media/audio/Star Platinum The World Start.mp3')
             TheWorld.play();
             ToggleBWFilter(4, 2);
             ManageRing(5, 2);
@@ -126,32 +198,44 @@ function ZaWarudo() {
     }
 }
 
-function Clock() {
-    let Timestamp = new Date();
-    let HoursDeg = ((Timestamp.getHours() % 12) / 12) * 360;
-    let MinutesDeg = (Timestamp.getMinutes() / 60) * 360;
-    let HoursHand = document.querySelector('.hours-hand');
-    let MinutesHand = document.querySelector('.minutes-hand');
-    const AngleIncrement = (2 * Math.PI) / (60 * EarthYear);
+function MadeInHeaven() {
 
-    HoursHand.style.transform = `rotate(${HoursDeg}deg)`;
-    MinutesHand.style.transform = `rotate(${MinutesDeg}deg)`;
+     if(!MadeInHeavenPhase1)
+     {
+        MadeInHeavenPhase1 = true;
+        let MaxSpeed = 2901;
 
-    function updateClockPosition() {
-        if (TimeSpeed !== 0) {
-            HoursDeg = HoursDeg + (AngleIncrement * TimeSpeed * 1 / 12);
-            MinutesDeg = MinutesDeg + (AngleIncrement * TimeSpeed);
-            HoursHand.style.transform = `rotate(${HoursDeg}deg)`;
-            MinutesHand.style.transform = `rotate(${MinutesDeg}deg)`;
-        }
-    }
+        let MadeInHeavenText = document.createElement('div');
+        MadeInHeavenText.id = 'MadeInHeaven';
+        MadeInHeavenText.innerHTML = 'Made in<br>Heaven';
 
-    function ClockFrame() {
-        updateClockPosition();
-        requestAnimationFrame(ClockFrame);
-    }
+        let Crucified = new Audio('./media/audio/Crucified Army of Lovers.mp3');
+        Crucified.play();
 
-    ClockFrame();
+        setTimeout(() =>
+        {
+            for(let i = 0; i < MaxSpeed; i++)
+                setTimeout(() => {TimeSpeed = 1+i/100;}, i);
+            
+        }, 17 * 1000);
+        setTimeout(() =>
+        {
+            let MadeInHeavenAudio = new Audio('./media/audio/MadeInHeaven.mp3');
+            MadeInHeavenAudio.play();
+            document.body.appendChild(MadeInHeavenText);
+            MadeInHeavenPhase1 = false;
+        }, 16 * 1000);
+        setTimeout(() =>
+        {
+            Clock(15);
+            document.body.removeChild(MadeInHeavenText);
+        }, 21 * 1000);
+        setTimeout(() =>
+        {
+            DaylightCycle(14);
+        }, 36 * 1000);
+        setTimeout(() => {Crucified.pause();}, 50 * 1000);
+     }
 }
 
 function GenerateStarDots() {
@@ -344,7 +428,8 @@ function SpiralAround(object, loops, duration, initialAngle) {
     }
 
     function animationControl() {
-        if ((performance.now() - startTime) / 1000 < duration) { // convert to seconds
+        if ((performance.now() - startTime) / 1000 < duration)
+        {
             spiralMovement();
             requestAnimationFrame(animationControl);
         } else {
