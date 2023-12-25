@@ -1,53 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <meta name="description" content="a simulation of Made in Heaven from Jojo Bizarre Adventure">
-        <meta name="theme-color" content="#FFFFFF"/>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="icon" type="image/x-icon" href="favicon.ico">
-        <link rel="stylesheet" type="text/css" href="style.css">
+        <link rel="stylesheet" type="text/css" href="style.css"> 
         <script type="text/javascript" src="script.js" defer></script>
-        <title>
-            Made in Heaven
-        </title>
     </head>
     <body>
-        <div class="X-axys"></div>
-        <div class="Y-axys"></div>
-        <div class="center"></div>
-        <div class="solar-system">
-            <div class="sun solar-object" onclick="MadeInHeaven()"></div>
-            <div class="mercury solar-object" data-angle="0"></div>
-            <div class="venus solar-object" data-angle="0"></div>
-            <div class="earth solar-object" onclick="ZaWarudo()" data-angle="0">
-                <div class="moon satellite" data-angle="0"></div>
-            </div>
-            <div class="mars solar-object" data-angle="0">
-                <div class="phobos satellite" data-angle="0"></div>
-                <div class="deimos satellite" data-angle="0"></div>
-            </div>
-            <div class="jupiter solar-object" data-angle="0">
-                <div class="io satellite" data-angle="0"></div>
-                <div class="europa satellite" data-angle="0"></div>
-                <div class="ganymede satellite" data-angle="0"></div> 
-                <div class="callisto satellite" data-angle="0"></div>
-            </div>
-            <div class="saturn solar-object" data-angle="0">
-                <div class="titan satellite" data-angle="0"></div>
-                <div class="rhea satellite" data-angle="0"></div>
-            </div>
-            <div class="uranus solar-object" data-angle="0">
-                <div class="titania satellite" data-angle="0"></div>
-                <div class="oberon satellite" data-angle="0"></div>
-            </div>
-            <div class="neptune solar-object" data-angle="0">
-                <div class="proteus satellite" data-angle="0"></div>
-                <div class="nereide satellite" data-angle="0"></div>
-            </div>
-            <div class="pluto solar-object" data-angle="0">
-                <div class="charon satellite" data-angle="0"></div>
-            </div>
-        </div>
+        <canvas id="canvas" data-filter="0"></canvas>
     </body>
 </html>
