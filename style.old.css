@@ -1,0 +1,379 @@
+body
+{
+    margin: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgb(0, 0, 15);
+    overflow: hidden;
+}
+
+@font-face {
+    font-family: 'OldLondon';
+    src: url('./media/font/OldLondon.ttf') format('truetype');
+}
+
+#MadeInHeaven
+{
+    position: absolute;
+    top: 20%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90vmin;
+    text-align: center;
+    color: white;
+    font-family: 'OldLondon';
+    font-size: 144pt;
+    line-height: 0.8;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5), 
+                 0 0 20px rgba(255, 255, 255, 0.4), 
+                 0 0 30px rgba(255, 255, 255, 0.3), 
+                 0 0 40px rgba(255, 255, 255, 0.2);
+    z-index: 32;
+}
+
+.X-axys
+{
+    width: 100%;
+    height: 1px;
+    top: 50%;
+    background-color: magenta;
+    position: absolute;
+    z-index: 32;
+    visibility: hidden;
+}
+
+.Y-axys
+{
+    width: 1px;
+    height: 100%;
+    left: 50%;
+    background-color: magenta;
+    position: absolute;
+    z-index: 32;
+    visibility: hidden;
+}
+
+.center
+{
+  aspect-ratio: 1/1;
+  width:1px;
+  position:absolute;
+  background: rgb(0, 0, 0);
+  left: 50%;
+  top: 50%;
+  z-index: 0;
+}
+
+.ring 
+{
+    border-radius: 50%;
+    position: fixed;
+    box-shadow: inset 0 0 50px 50px rgba(0, 0, 0, 0.7);
+    transform: translate(-50%, -50%);
+    z-index: 4;
+}
+
+.watchface {
+    aspect-ratio: 1/1;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 130vh;
+    background: url('./media/images/watchface.svg') center center/cover no-repeat;
+    opacity: 50%;
+    z-index: 10;
+    transform: translate(-50%, -50%);
+}
+
+.minutes-hand {
+    aspect-ratio: 1/1;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 130vh;
+    background: url('./media/images/minutes.svg') center center/cover no-repeat;
+    opacity: 50%;
+    z-index: 11;
+    transform-origin: center;
+    transform: rotate(0deg);
+}
+
+.hours-hand {
+    aspect-ratio: 1/1;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 130vh;
+    background: url('./media/images/hours.svg') center center/cover no-repeat;
+    opacity: 50%;
+    z-index: 12;
+    transform-origin: center;
+    transform: rotate(0deg);
+}
+
+.star-dot{
+    aspect-ratio: 1/1;
+    position: absolute;
+    border-radius: 50%;
+    background-color: rgb(137, 137, 3);
+    box-shadow: 0 0 5px 2px rgba(191, 191, 3, 0.8);
+    transform: translate(-50%, -50%);
+    z-index: 0;
+}
+
+.asteroids-belt-rock
+{
+    aspect-ratio: 1/1;
+    position: absolute;
+    border-radius: 50%;
+    background-color: rgb(180, 102, 0);
+    transform: translate(50%, 50%); 
+    z-index: 2; 
+}
+
+.orbit
+{
+    aspect-ratio: 1/1;
+    position: absolute;
+    border-radius: 50%;
+    box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.3);
+    z-index: 1;
+}
+
+.night-to-day {
+    position: absolute;
+    top: 0;
+    left: 0%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to right, rgba(255, 255, 255, 0.6), rgba(50, 50, 50, 0.7) 10%);
+    z-index: 4;
+}
+.day-to-night {
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to left, rgba(255, 255, 255, 0.6) 70%, rgba(50, 50, 50, 0.7));
+    z-index: 4;
+}
+
+.solar-object
+{
+    aspect-ratio: 1 / 1;
+    margin: 0px;
+    border-radius: 50%;
+    position: absolute;
+    z-index: 2;
+}
+
+.satellite
+{
+    aspect-ratio: 1 / 1;
+    margin: 0px;
+    position: fixed;
+    z-index: 3;
+}
+
+.sun
+{
+    width: 50px;
+    background: url('./media/images/sun.png') center center/cover no-repeat;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 10px 10px rgba(230, 96, 0, 0.7);
+}
+
+.sun:hover
+{
+  box-shadow:
+    0 0 0 2px rgba(255, 255, 255, 0.7),
+    0 0 10px 10px rgba(230, 96, 0, 0.7);
+}
+
+.mercury
+{
+    width: 8px;
+    background: url('./media/images/mercury.png') center center/cover no-repeat;
+}
+
+.venus
+{
+    width: 16px;
+    background: url('./media/images/venus.png') center center/cover no-repeat;
+}
+
+.earth
+{
+    width: 17px;
+    background: url('./media/images/earth.png') center center/cover no-repeat;
+}
+
+.earth:hover
+{
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.7);
+}
+
+.moon
+{
+    width: 6px;
+    border-radius: 50%;
+    background: url('./media/images/moon.png') center center/cover no-repeat;
+}
+
+.mars
+{
+    width: 14px;
+    background: url('./media/images/mars.png') center center/cover no-repeat;
+}
+
+.phobos
+{
+    width: 5px;
+    background: url('./media/images/phobos.png') center center/cover no-repeat;
+}
+
+.deimos
+{
+    width: 4px;
+    background: url('./media/images/deimos.png') center center/cover no-repeat;
+}
+
+.jupiter
+{
+    width: 36px;
+    background: url('./media/images/jupiter.png') center center/cover no-repeat;
+}
+
+.io
+{
+    width: 4px;
+    border-radius: 50%;
+    background: url('./media/images/io.png') center center/cover no-repeat;
+}
+
+.europa
+{
+    width: 4px;
+    border-radius: 50%;
+    background: url('./media/images/europa.png') center center/cover no-repeat;
+}
+
+.ganymede
+{
+    width: 6px;
+    border-radius: 50%;
+    background: url('./media/images/ganymede.png') center center/cover no-repeat;
+}
+
+.callisto
+{
+    width: 5px;
+    border-radius: 50%;
+    background: url('./media/images/callisto.png') center center/cover no-repeat;
+}
+
+.saturn
+{
+    width: 32px;
+    background: url('./media/images/saturn.png') center center/cover no-repeat;
+}
+
+.saturn::before
+{
+    content: "";
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    box-shadow: inset -3px 0 10px rgba(0, 0, 0, 0.3), inset 3px 0 10px rgba(255, 255, 255, 0.3);
+    z-index: 3;
+}
+
+.saturn::after 
+{
+    content: "";
+    display: block;
+    width: 200%;
+    height: 30%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 50%; 
+    clip-path: polygon(0 20%, 100% 20%, 100% 100%, 0 100%);
+    z-index: 4;
+}
+
+.titan
+{
+    width: 7px;
+    border-radius: 50%;
+    background: url('./media/images/titan.png') center center/cover no-repeat;
+}
+
+.rhea
+{
+    width: 4px;
+    border-radius: 50%;
+    background: url('./media/images/rhea.png') center center/cover no-repeat;
+}
+
+.uranus
+{
+    width:26px;
+    background: url('./media/images/uranus.png') center center/cover no-repeat;
+}
+
+.titania
+{
+    width: 5px;
+    border-radius: 50%;
+    background: url('./media/images/titania.png') center center/cover no-repeat;
+}
+
+.oberon
+{
+    width: 5px;
+    border-radius: 50%;
+    background: url('./media/images/oberon.png') center center/cover no-repeat;
+}
+
+.neptune
+{
+    width:25px;
+    background: url('./media/images/neptune.png') center center/cover no-repeat;
+}
+
+.nereide
+{
+    width: 4px;
+    border-radius: 50%;
+    background: url('./media/images/nereide.png') center center/cover no-repeat;
+}
+
+.proteus
+{
+    width: 4px;
+    border-radius: 50%;
+    background: url('./media/images/proteus.png') center center/cover no-repeat;
+}
+
+.pluto
+{
+    width:8px;
+    background: url('./media/images/pluto.png') center center/cover no-repeat;
+}
+
+.charon
+{
+    width: 4px;
+    border-radius: 50%;
+    background: url('./media/images/charon.png') center center/cover no-repeat;
+}
