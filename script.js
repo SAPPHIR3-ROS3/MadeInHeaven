@@ -1393,7 +1393,7 @@ function(event) {
 window.addEventListener('click',
 function(){
     mouse.clicked = true;
-    this.setTimeout(() => mouse.clicked = false, 10);
+    preciseSetTimeout(() => mouse.clicked = false, 10);
 });
 
 window.addEventListener('resize',
