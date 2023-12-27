@@ -57,7 +57,7 @@ let SatelliteOrbits =
 let EarthYear = 60;
 let PreviousTimeSpeed = 0;
 let TimeSpeed = 1;
-let trails = 1000;
+let trails = 200;
 let RandomPosition = true;
 let MadeInHeavenIsRunning = false;
 let UniverseIsResetting = false;
@@ -613,7 +613,15 @@ class BlackHole{
         this.OuterRadius = 1.35 * this.radius;
     }
 
-    draw(ctx) {
+    draw(ctx, white = false) {
+        if(white)
+        {
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.radius, 0, 2 * Math.PI);
+            ctx.fillStyle = 'white';
+            ctx.fill();
+            ctx.closePath();
+        }
         let x = this.x + (Math.random() - 0.5) * this.vibration;
         let y = this.y + (Math.random() - 0.5) * this.vibration;
 
@@ -645,6 +653,18 @@ class BlackHole{
 
 // general functions
 
+function preciseSetTimeout(callback, delay) {
+    let start = performance.now();
+
+    function tick() {
+        let now = performance.now();
+        let difference = now - start;
+
+        (difference >= delay) ? callback() : requestAnimationFrame(tick); 
+    }
+    tick();
+}
+
 function init() {
     canvas = document.getElementById('canvas');
     ctx = canvas.getContext('2d', { willReadFrequently: true });
@@ -671,7 +691,7 @@ function ToggleBWFilter(canvas, seconds, SecondsDelay = 0, increment = true) {
     }
 
     for(let gray = 0; gray < 101; gray++) 
-        setTimeout(BWPercentage.bind(null, InitialGray + GrayDelta * gray), SecondsDelay * 1000 + gray * duration);
+        preciseSetTimeout(BWPercentage.bind(null, InitialGray + GrayDelta * gray), SecondsDelay * 1000 + gray * duration);
 }
 
 function Clock(seconds) {
@@ -1208,11 +1228,11 @@ function ZaWarudoStart(canvas, ctx, StarDots, orbits, AsteroidsBelt, Sun, Planet
 
     mouse.clicked = false;
     ZaWarudoIsRunning = true;
-    setTimeout(() => {ZaWarudoIsRunning = false}, StartDuration * 1000);
-    setTimeout(() => {PreviousTimeSpeed = TimeSpeed; TimeSpeed = 0;}, delay * 1000);
+    preciseSetTimeout(() => {ZaWarudoIsRunning = false}, StartDuration * 1000);
+    preciseSetTimeout(() => {PreviousTimeSpeed = TimeSpeed; TimeSpeed = 0;}, delay * 1000);
     TheWorldStart.play();
     ToggleBWFilter(canvas, StartDuration, delay, true);
-    setTimeout(() => {
+    preciseSetTimeout(() => {
         StartTime = performance.now();
         animate();
     }, delay * 1000);
@@ -1277,11 +1297,11 @@ function ZaWarudoEnd(canvas, ctx, StarDots, orbits, AsteroidsBelt, Sun, Planets)
 
     mouse.clicked = false;
     ZaWarudoIsRunning = true;
-    setTimeout(() => {ZaWarudoIsRunning = false}, EndDuration * 1000);
-    setTimeout(() => {TimeSpeed = PreviousTimeSpeed; PreviousTimeSpeed = 0;}, EndDuration * 1000);
+    preciseSetTimeout(() => {ZaWarudoIsRunning = false}, EndDuration * 1000);
+    preciseSetTimeout(() => {TimeSpeed = PreviousTimeSpeed; PreviousTimeSpeed = 0;}, EndDuration * 1000);
     TheWorldEnd.play();
     ToggleBWFilter(canvas, EndDuration, 0, false);
-    setTimeout(() => {
+    preciseSetTimeout(() => {
         EndTime = performance.now();
         animate();
     }, 0);
@@ -1304,56 +1324,52 @@ function MadeInHeavenStart() {
         let MadeInHeavenText = document.createElement('div');
         MadeInHeavenText.id = 'MadeInHeaven';
         MadeInHeavenText.innerHTML = 'Made in<br>Heaven';
-        let StartTime = performance.now();
-        let CurrentTime;
         
         Crucified.play();
 
-        setTimeout(() =>
+        preciseSetTimeout(() =>
         {
             for(let i = 0; i < SpeedPhase1; i++)
-                setTimeout(() => {
+                preciseSetTimeout(() => {
                     TimeSpeed = 1+i/100;
                 }, i/SpeedPhase1 * SpeedPhase1);
             
-            CurrentTime = performance.now();
         }, DPhase0 * 1000);
-        setTimeout(() =>
+        preciseSetTimeout(() =>
         {
             MadeInHeavenAudio.play();
             document.body.appendChild(MadeInHeavenText);
         }, (DPhase0 - 1) * 1000);
-        setTimeout(() =>
+        preciseSetTimeout(() =>
         {
             Clock(DPhase2);
 
             for(let i = SpeedPhase1 + 99; i < SpeedPhase2; i++)
-                setTimeout(() => {
+                preciseSetTimeout(() => {
                     TimeSpeed = i/100;
                 }, (i - SpeedPhase1 - 99)/(SpeedPhase2 - SpeedPhase1) * DPhase2 * 1000);
 
             document.body.removeChild(MadeInHeavenText);
             CurrentTime = performance.now();
         }, (DPhase0 + DPhase1) * 1000);
-        setTimeout(() =>
+        preciseSetTimeout(() =>
         {
             DaylightCycle(DPhase3);
 
             for(let i = SpeedPhase2 - 1; i < SpeedPhase3; i++)
                 if(i % 200 == 0)
-                    setTimeout(() => {
+                    preciseSetTimeout(() => {
                         TimeSpeed = i/100;
                     }, (i - SpeedPhase2 + 1)/(SpeedPhase3 - SpeedPhase2) * DPhase3 * 1000);
 
             CurrentTime = performance.now();
         }, (DPhase0+DPhase1+DPhase2) * 1000);
-        setTimeout(() =>
+        preciseSetTimeout(() =>
         {
             TimeSpeed = 0;
             UniverseResetAudio.play();
-            CurrentTime = performance.now();
         }, (DPhase0+DPhase1+DPhase2+DPhase3) * 1000);
-        setTimeout(() => 
+        preciseSetTimeout(() => 
         {
             MadeInHeavenIsRunning = false;
             CurrentTime = performance.now();
@@ -1395,6 +1411,10 @@ function() {
 
     Sun.setCenter(canvas.width / 2, canvas.height / 2, 0);
     Sun.update(ctx, 0, 0);
-    // Reset.setCenter(canvas.width / 2, canvas.height / 2, 0);
-    // Reset.draw(ctx);
+
+    if(UniverseIsResetting)
+    {
+        Reset.setCenter(canvas.width / 2, canvas.height / 2, 0);
+        Reset.draw(ctx);
+    }
 });
