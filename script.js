@@ -5,6 +5,9 @@ const TheWorldEnd = new Audio('./media/audio/Star Platinum The World End.mp3');
 const Crucified = new Audio('./media/audio/Crucified Army of Lovers Short.mp3');
 const MadeInHeavenAudio = new Audio('./media/audio/MadeInHeaven.mp3');
 const UniverseResetAudio = new Audio('./media/audio/UniverseReset.mp3');
+for (const audio of [TheWorldStart, TheWorldEnd, Crucified, MadeInHeavenAudio, UniverseResetAudio]) {
+    audio.preload = 'none';
+}
 const SolarObjectsImages = 
 {
     'sun': './media/images/sun.png',
@@ -75,6 +78,27 @@ let Planets;
 let TimeStopState = 'idle';
 let TimeStopStartedAt = 0;
 let FrameScale = 1;
+let StaticScene;
+let StaticSceneDirty = true;
+
+// Il livello statico viene ricostruito solo dopo un ridimensionamento.
+function DrawStaticScene(target) {
+    if (!StaticScene) StaticScene = document.createElement('canvas');
+    if (StaticSceneDirty || StaticScene.width !== canvas.width || StaticScene.height !== canvas.height) {
+        StaticScene.width = canvas.width;
+        StaticScene.height = canvas.height;
+        const layer = StaticScene.getContext('2d');
+        // Uno sfondo opaco rende difference equivalente all'inversione RGB.
+        layer.fillStyle = 'rgb(0, 0, 15)';
+        layer.fillRect(0, 0, canvas.width, canvas.height);
+        for (const star of StarDots) star.draw(layer);
+        for (let i = 0; i < orbits.length; i++) {
+            if (i !== 4) orbits[i].draw(layer);
+        }
+        StaticSceneDirty = false;
+    }
+    target.drawImage(StaticScene, 0, 0);
+}
 
 let mouse = {x: undefined, y: undefined};
 
@@ -100,12 +124,9 @@ class StarDot {
         this.angle = angle;
         this.DistanceRadius = radius;
 
-        if(this.trail.length < this.spirals)
-            this.trail.unshift({x : this.x, y : this.y});
-        else
-        {
-            this.trail.pop();
-            this.trail.unshift({x : this.x, y : this.y});
+        if (UniverseIsResetting) {
+            if (this.trail.length >= this.spirals) this.trail.pop();
+            this.trail.unshift({x: this.x, y: this.y});
         }
 
         this.x = canvas.width / 2 + this.DistanceRadius * Math.cos(this.angle);
@@ -216,12 +237,9 @@ class Asteroid {
         this.AngleRadians = this.angle * (Math.PI / 180);
         this.DistanceRadius = radius;
 
-        if(this.trail.length < this.spirals)
-            this.trail.unshift({x : this.x, y : this.y});
-        else
-        {
-            this.trail.pop();
-            this.trail.unshift({x : this.x, y : this.y});
+        if (UniverseIsResetting) {
+            if (this.trail.length >= this.spirals) this.trail.pop();
+            this.trail.unshift({x: this.x, y: this.y});
         }
 
         this.x = canvas.width / 2 + this.DistanceRadius * Math.cos(this.AngleRadians);
@@ -237,7 +255,9 @@ class Asteroid {
     }
 
     setCenter(x, y, radius) {
-        this.center = {x : x, y : y, radius : radius};
+        this.center.x = x;
+        this.center.y = y;
+        this.center.radius = radius;
     }
 
     draw(ctx, trail = false) {
@@ -301,7 +321,9 @@ class SolarObject {
     }
 
     setCenter(x, y, radius) {
-        this.center = {x : x, y : y, radius : radius};
+        this.center.x = x;
+        this.center.y = y;
+        this.center.radius = radius;
     }
 
     setAngle(angle) {
@@ -334,12 +356,9 @@ class SolarObject {
         this.AngleRadians = this.OrbitAngle * (Math.PI / 180);
         this.OrbitRadius = radius;
 
-        if(this.trail.length < this.spirals)
-            this.trail.unshift({x : this.x, y : this.y});
-        else
-        {
-            this.trail.pop();
-            this.trail.unshift({x : this.x, y : this.y});
+        if (UniverseIsResetting) {
+            if (this.trail.length >= this.spirals) this.trail.pop();
+            this.trail.unshift({x: this.x, y: this.y});
         }
 
         this.x = this.center.x + this.OrbitRadius * Math.cos(this.AngleRadians);
@@ -442,7 +461,9 @@ class Satellite {
     }
 
     setCenter(x, y, radius) {
-        this.center = {x : x, y : y, radius : radius};
+        this.center.x = x;
+        this.center.y = y;
+        this.center.radius = radius;
     }
 
     setRadius(radius) {
@@ -562,35 +583,15 @@ class ZaWarudoRing{
     };
 
     draw(ctx) {
-        let offscreenCanvas = document.createElement('canvas');
-        offscreenCanvas.width = ctx.canvas.width;
-        offscreenCanvas.height = ctx.canvas.height;
-        let offscreenCtx = offscreenCanvas.getContext('2d');
-    
-        offscreenCtx.drawImage(ctx.canvas, 0, 0);
-        offscreenCtx.arc(this.center.x, this.center.y, this.radius, 0, 2 * Math.PI, false);
-        offscreenCtx.stroke();
-        offscreenCtx.fill();
-
-        let imageData = ctx.getImageData(0, 0, offscreenCanvas.width, offscreenCanvas.height);
-
-        for(let i = 0; i < imageData.data.length; i += 4) {
-            let x = (i / 4) % offscreenCanvas.width;
-            let y = Math.floor((i / 4) / offscreenCanvas.width);
-            let dx = this.center.x - x;
-            let dy = this.center.y - y;
-            let distance = Math.sqrt(dx * dx + dy * dy);
-
-            if(distance < this.radius) {
-                imageData.data[i] = 255 - imageData.data[i];     
-                imageData.data[i + 1] = 255 - imageData.data[i + 1];
-                imageData.data[i + 2] = 255 - imageData.data[i + 2];
-                imageData.data[i + 3] = imageData.data[i + 3];
-            }
-        }
-
-        offscreenCtx.putImageData(imageData, 0, 0);
-        ctx.drawImage(offscreenCanvas, 0, 0);
+        if (this.radius <= 0) return;
+        // Il compositing evita readback GPU e scansioni JavaScript dei pixel.
+        ctx.save();
+        ctx.globalCompositeOperation = 'difference';
+        ctx.fillStyle = '#fff';
+        ctx.beginPath();
+        ctx.arc(this.center.x, this.center.y, this.radius, 0, 2 * Math.PI);
+        ctx.fill();
+        ctx.restore();
     }
 
     update(ctx, earth, radius) {
@@ -684,7 +685,7 @@ function AccelerateTime(from, to, milliseconds) {
 
 function init() {
     canvas = document.getElementById('canvas');
-    ctx = canvas.getContext('2d', { willReadFrequently: true });
+    ctx = canvas.getContext('2d');
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
     StarDots = GenerateStarDots(canvas);
@@ -795,18 +796,14 @@ function DaylightCycle(seconds) {
     document.body.appendChild(btw);
     document.body.appendChild(wtb);
 
+    let position = 0;
+    btw.style.willChange = wtb.style.willChange = 'transform';
     function ScrollDaylight() {
-        let btwLeft = btw.offsetLeft / window.innerWidth * 100 + Math.log(Math.max(1, TimeSpeed)) * exponent * FrameScale;
-        let wtbLeft = wtb.offsetLeft / window.innerWidth * 100 + Math.log(Math.max(1, TimeSpeed)) * exponent * FrameScale;
-
-        if (btwLeft > 100)
-            btwLeft -= 200;
-
-        if (wtbLeft > 100)
-            wtbLeft -= 200;
-
-        btw.style.left = `${btwLeft}%`;
-        wtb.style.left = `${wtbLeft}%`;
+        const delta = Math.log(Math.max(1, TimeSpeed)) * exponent * FrameScale;
+        position = ((position + delta + 100) % 200) - 100;
+        const otherPosition = ((position + 200) % 200) - 100;
+        btw.style.transform = `translateX(${position}%)`;
+        wtb.style.transform = `translateX(${otherPosition + 100}%)`;
     }
 
     function DayNight() {
@@ -985,12 +982,7 @@ function OrbitScene(canvas, ctx, StarDots, orbits, AsteroidsBelt, Sun, Planets) 
         {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            for(let i = 0; i < StarDots.length; i++)
-                StarDots[i].draw(ctx);
-
-            for(let i = 0; i < orbits.length; i++)
-                if(i !== 4)
-                    orbits[i].draw(ctx);
+            DrawStaticScene(ctx);
 
             for(let i = 0; i < AsteroidsBelt.length; i++)
             {
@@ -1345,4 +1337,5 @@ window.addEventListener('resize', function() {
         }
     }
     Reset.setCenter(canvas.width / 2, canvas.height / 2);
+    StaticSceneDirty = true;
 });

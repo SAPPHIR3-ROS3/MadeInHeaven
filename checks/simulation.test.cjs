@@ -105,3 +105,24 @@ test('Reset: satelliti finiti, centro corretto e conclusione della sequenza', ()
     sim.step();
     assert.equal(sim.sandbox.reloaded, true);
 });
+
+test('Cache statica: riuso tra frame e invalidazione al resize', () => {
+    const sim = simulation();
+    sim.run('globalThis.cachedLayer = StaticScene; globalThis.starDraws = 0; StarDots.forEach(star => { star.draw = () => starDraws++; });');
+    sim.step(); sim.step();
+    assert.equal(sim.run('starDraws'), 0);
+    assert.equal(sim.run('StaticScene === cachedLayer'), true);
+    sim.sandbox.innerWidth = 400; sim.sandbox.innerHeight = 300;
+    sim.events.resize(); sim.step();
+    assert.equal(sim.run('starDraws'), 500);
+    sim.step();
+    assert.equal(sim.run('starDraws'), 500);
+    assert.equal(sim.run('AsteroidsBelt.every(a => a.trail.length === 0) && Planets.every(p => p.trail.length === 0)'), true);
+});
+
+test('Fermatempo: nessun readback dei pixel', () => {
+    const sim = simulation();
+    sim.run("ctx.getImageData = () => { throw new Error('Readback inatteso'); };");
+    sim.click('Planets[2]'); sim.step(3000); sim.step(3000);
+    assert.equal(sim.run('TimeStopState'), 'stopped');
+});
