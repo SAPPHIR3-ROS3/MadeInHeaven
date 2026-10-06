@@ -71,8 +71,12 @@ let AsteroidsBelt;
 let Sun;
 let Reset;
 let Ring;
+let Planets;
+let TimeStopState = 'idle';
+let TimeStopStartedAt = 0;
+let FrameScale = 1;
 
-let mouse = {x: undefined, y: undefined, clicked: false};
+let mouse = {x: undefined, y: undefined};
 
 // classes 
 
@@ -161,7 +165,7 @@ class Orbit {
         this.CenterX = CenterX;
         this.CenterY = CenterY;
         this.radius = radius;
-        this.RadiusPercentage = radius / CenterY;
+        this.RadiusPercentage = radius / Math.min(CenterX, CenterY);
         this.thickness = 2.5;
         this.color = 'rgba(255, 255, 255, 0.3)';
     }
@@ -304,7 +308,7 @@ class SolarObject {
         this.OrbitAngle = angle;
         this.AngleRadians = this.OrbitAngle * (Math.PI / 180);
         this.x = this.center.x + this.OrbitRadius * Math.cos(this.AngleRadians);
-        this.y = this.center.y / 2 + this.OrbitRadius * Math.sin(this.AngleRadians);
+        this.y = this.center.y + this.OrbitRadius * Math.sin(this.AngleRadians);
     }
 
     setRadian(radian) {
@@ -322,7 +326,7 @@ class SolarObject {
 
     setPeriod(period) {
         this.OrbitPeriod = period;
-        this.AngleDelta = 360 / this.OrbitPeriod;
+        this.AngleDelta = 360 / (this.OrbitPeriod * 60);
     }
 
     setPosition(angle, radius) {
@@ -427,7 +431,8 @@ class Satellite {
         this.AngleDelta = 360 / (this.RelativeOrbitPeriod * 60);
         this.x = this.center.x + this.RelativeOrbitRadius * Math.cos(this.OrbitAngle);
         this.y = this.center.y + this.RelativeOrbitRadius * Math.sin(this.OrbitAngle);
-        this.RadiusPercentage = this.OrbitRadius / canvas.height;
+        this.OrbitRadius = this.RelativeOrbitRadius;
+        this.RadiusPercentage = this.RelativeOrbitRadius / canvas.height;
         this.spirals = spirals;
         this.image = new Image();
         this.image.src = image;
@@ -442,6 +447,7 @@ class Satellite {
 
     setRadius(radius) {
         this.RelativeOrbitRadius = radius;
+        this.OrbitRadius = radius;
         this.x = this.center.x + this.RelativeOrbitRadius * Math.cos(this.AngleRadians);
         this.y = this.center.y + this.RelativeOrbitRadius * Math.sin(this.AngleRadians);
     }
@@ -455,12 +461,13 @@ class Satellite {
 
     setPeriod(period) {
         this.RelativeOrbitPeriod = period;
-        this.AngleDelta = 360 / this.RelativeOrbitPeriod;
+        this.AngleDelta = 360 / (this.RelativeOrbitPeriod * 60);
     }
 
     setPosition(angle, radius) {
         this.OrbitAngle = angle % 360;
         this.AngleRadians = this.OrbitAngle * (Math.PI / 180);
+        this.RelativeOrbitRadius = radius;
         this.OrbitRadius = radius;
         this.x = this.center.x + this.OrbitRadius * Math.cos(this.AngleRadians);
         this.y = this.center.y + this.OrbitRadius * Math.sin(this.AngleRadians);
@@ -469,6 +476,7 @@ class Satellite {
     setPositionRadians(radian, radius) {
         this.AngleRadians = radian;
         this.OrbitAngle = (this.AngleRadians * (180 / Math.PI)) % 360;
+        this.RelativeOrbitRadius = radius;
         this.OrbitRadius = radius;
         this.x = this.center.x + this.OrbitRadius * Math.cos(this.AngleRadians);
         this.y = this.center.y + this.OrbitRadius * Math.sin(this.AngleRadians);
@@ -479,21 +487,22 @@ class Satellite {
         let dy = this.y - canvas.height / 2;
         let DistanceRadius = Math.sqrt(dx * dx + dy * dy);
         let angle = (Math.atan2(dy, dx) * (180 / Math.PI)) < 0 ? (Math.atan2(dy, dx) * (180 / Math.PI)) + 360 : (Math.atan2(dy, dx) * (180 / Math.PI));
-        this.setCenter({ x: canvas.width / 2, y: canvas.height / 2 });
-        this.setPosition(canvas, angle, DistanceRadius);
+        this.setCenter(canvas.width / 2, canvas.height / 2, 0);
+        this.RelativeOrbitRadius = DistanceRadius;
+        this.setPosition(angle, DistanceRadius);
     }
 
     orbit(){
-        function updatePosition() {
+        const updatePosition = () => {
             let LocalCanvas = document.getElementById('canvas');
             let LocalCtx = LocalCanvas.getContext('2d');
             let angle = this.OrbitAngle; 
-            let delta = this.AngleDelta * TimeSpeed;
+            let delta = this.AngleDelta * TimeSpeed * FrameScale;
             let radius = this.OrbitRadius;
             this.update(LocalCtx, (angle + delta) % 360 , radius);
         }
 
-        function animate(){
+        const animate = () => {
             if(TimeSpeed !== 0 || !MadeInHeavenIsRunning)
             {
                 updatePosition();
@@ -509,7 +518,7 @@ class Satellite {
         let InitialRadian = this.AngleRadians;
         let InitialRadius = this.OrbitRadius;
         
-        function updatePosition() {
+        const updatePosition = () => {
             let currentTime = performance.now();
             let elapsed = (currentTime - StartTime) / 1000;
             let radian = InitialRadian * (1 - Math.min(1, elapsed / duration)) * 2 * Math.PI * loops;
@@ -518,7 +527,7 @@ class Satellite {
             this.setPositionRadians(radian, radius);
         }
 
-        function animate(){
+        const animate = () => {
             if((performance.now() - StartTime) / 1000 < duration)
             {
                 updatePosition();
@@ -654,15 +663,23 @@ class BlackHole{
 // general functions
 
 function preciseSetTimeout(callback, delay) {
-    let start = performance.now();
+    return window.setTimeout(callback, Math.max(0, delay));
+}
 
-    function tick() {
-        let now = performance.now();
-        let difference = now - start;
+function PlayAudio(audio) {
+    audio.currentTime = 0;
+    const playback = audio.play();
+    if (playback) playback.catch(() => {});
+}
 
-        (difference >= delay) ? callback() : requestAnimationFrame(tick); 
+function AccelerateTime(from, to, milliseconds) {
+    const start = performance.now();
+    function frame() {
+        const progress = Math.min(1, (performance.now() - start) / milliseconds);
+        TimeSpeed = from + (to - from) * progress;
+        if (progress < 1) requestAnimationFrame(frame);
     }
-    tick();
+    frame();
 }
 
 function init() {
@@ -708,7 +725,7 @@ function Clock(seconds) {
     let HoursHand = document.createElement('div');
     let MinutesHand = document.createElement('div');
     const AngleIncrement = (2 * Math.PI) / (60 * EarthYear);
-    const increment = AngleIncrement * TimeSpeed * (Math.log(TimeSpeed))**exponent;
+
     WatchFace.classList.add('watchface');
     HoursHand.classList.add('hours-hand');
     MinutesHand.classList.add('minutes-hand');
@@ -716,8 +733,8 @@ function Clock(seconds) {
     Watch.appendChild(MinutesHand);
     Watch.appendChild(HoursHand);
     document.body.appendChild(Watch);
-    HoursHand.style.transform = `rotate(${HoursDeg}deg)`;
-    MinutesHand.style.transform = `rotate(${MinutesDeg}deg)`;
+    HoursHand.style.transform = `translate(-50%, -50%) rotate(${HoursDeg}deg)`;
+    MinutesHand.style.transform = `translate(-50%, -50%) rotate(${MinutesDeg}deg)`;
 
     function ClockOpacity(opacity){
         WatchFace.style.opacity = opacity;
@@ -746,6 +763,7 @@ function Clock(seconds) {
 
     function updateClockPosition() {
         if (TimeSpeed !== 0) {
+            const increment = AngleIncrement * TimeSpeed * Math.max(0, Math.log(TimeSpeed))**exponent * FrameScale;
             HoursDeg += increment / 12;
             MinutesDeg += increment;
             HoursHand.style.transform = `translate(-50%, -50%) rotate(${HoursDeg}deg)`;
@@ -778,8 +796,8 @@ function DaylightCycle(seconds) {
     document.body.appendChild(wtb);
 
     function ScrollDaylight() {
-        let btwLeft = btw.offsetLeft / window.innerWidth * 100 + 1 * Math.log(TimeSpeed) * exponent;
-        let wtbLeft = wtb.offsetLeft / window.innerWidth * 100 + 1 * Math.log(TimeSpeed) * exponent;
+        let btwLeft = btw.offsetLeft / window.innerWidth * 100 + Math.log(Math.max(1, TimeSpeed)) * exponent * FrameScale;
+        let wtbLeft = wtb.offsetLeft / window.innerWidth * 100 + Math.log(Math.max(1, TimeSpeed)) * exponent * FrameScale;
 
         if (btwLeft > 100)
             btwLeft -= 200;
@@ -841,8 +859,9 @@ function GenerateOrbits(canvas) {
     let Orbits = [];
     let CenterX = canvas.width / 2;
     let CenterY = canvas.height / 2;
-    const MinRadius = 0.125 * CenterY;
-    const MaxRadius = CenterY + 0.065 * CenterY;
+    const extent = Math.min(CenterX, CenterY);
+    const MinRadius = 0.125 * extent;
+    const MaxRadius = extent * 1.065;
     const NumOrbits = 10;
 
     for(let i = 0; i < NumOrbits; i++)
@@ -903,7 +922,7 @@ function GeneratePlanetsAndSatellites(canvas, orbits) {
     let Mars = new SolarObject('mars', 7,orbits[3].radius, OrbitPeriodMultiplier[3] * EarthYear, 3.5, SolarObjectsImages['mars'], canvas);
     Mars.setPosition(Math.random() * 359, Mars.OrbitRadius);
     let Phobos = new Satellite('phobos', 2.5, Mars.radius * CenterMultiplier + 2.5, SatelliteOrbits['phobos'] * Mars.OrbitPeriod, Mars, 3.5, SatellitesImages['phobos'], canvas);
-    let Deimos = new Satellite('deimos', 2, Mars.radius * CenterMultiplier + Phobos.radius * 2 + 2 + 1, SatelliteOrbits['deimos'] * Mars.OrbitPeriod, 3.5, Mars, SatellitesImages['deimos'], canvas);
+    let Deimos = new Satellite('deimos', 2, Mars.radius * CenterMultiplier + Phobos.radius * 2 + 2 + 1, SatelliteOrbits['deimos'] * Mars.OrbitPeriod, Mars, 3.5, SatellitesImages['deimos'], canvas);
     Phobos.setPosition(Math.random() * 359, Phobos.center.radius * CenterMultiplier + Phobos.radius);
     Deimos.setPosition(Math.random() * 359, Deimos.center.radius * CenterMultiplier + Phobos.radius * 2 + Deimos.radius + 1);
     Mars.setSatellites([Phobos, Deimos]);
@@ -956,8 +975,13 @@ function GeneratePlanetsAndSatellites(canvas, orbits) {
 }
 
 function OrbitScene(canvas, ctx, StarDots, orbits, AsteroidsBelt, Sun, Planets) {
+    let lastFrame = performance.now();
     function update() {
-        if(TimeSpeed != 0 && !UniverseIsResetting)
+        const now = performance.now();
+        FrameScale = Math.min(3, Math.max(0, (now - lastFrame) / (1000 / 60)));
+        lastFrame = now;
+        const ringProgress = UpdateTimeStop();
+        if(!UniverseIsResetting && !(TimeSpeed === 0 && MadeInHeavenIsRunning))
         {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -972,7 +996,7 @@ function OrbitScene(canvas, ctx, StarDots, orbits, AsteroidsBelt, Sun, Planets) 
             {
                 AsteroidsBelt[i].setCenter(canvas.width/2, canvas.height/2, 0);
                 let angle = AsteroidsBelt[i].angle; 
-                let delta = AsteroidsBelt[i].AngleDelta * TimeSpeed;
+                let delta = AsteroidsBelt[i].AngleDelta * TimeSpeed * FrameScale;
                 let radius = AsteroidsBelt[i].DistanceRadius;
                 AsteroidsBelt[i].update(canvas, ctx, (angle + delta) % 360 , radius);
             }
@@ -983,44 +1007,31 @@ function OrbitScene(canvas, ctx, StarDots, orbits, AsteroidsBelt, Sun, Planets) 
             {
                 Planets[i].setCenter(canvas.width/2, canvas.height/2, 0);
                 let angle = Planets[i].OrbitAngle; 
-                let delta = Planets[i].AngleDelta * TimeSpeed;
+                let delta = Planets[i].AngleDelta * TimeSpeed * FrameScale;
                 let radius = Planets[i].OrbitRadius;
                 Planets[i].update(ctx, (angle + delta) % 360, radius);
 
                 for(let j = 0; j < Planets[i].Satellites.length; j++)
                 {
                     let angle = Planets[i].Satellites[j].OrbitAngle; 
-                    let delta = Planets[i].Satellites[j].AngleDelta * TimeSpeed;
+                    let delta = Planets[i].Satellites[j].AngleDelta * TimeSpeed * FrameScale;
                     let radius = Planets[i].Satellites[j].RelativeOrbitRadius;
                     Planets[i].Satellites[j].update(ctx, (angle + delta) % 360, radius);
                 }
             }
 
-            if(!MadeInHeavenIsRunning)
-            {
-                if(Math.abs(mouse.x - Sun.x) < Sun.radius && Math.abs(mouse.y - Sun.y) < Sun.radius)
-                {    
-                    HoverEffect(ctx, Sun);
-
-                    if(mouse.clicked)
-                    {
-                        MadeInHeavenStart();
-                        mouse.clicked = false;
-                    }
-                }
-
-                let EarthIndex = 2
-
-                if(Math.abs(mouse.x - Planets[EarthIndex].x) < Planets[EarthIndex].radius && Math.abs(mouse.y - Planets[EarthIndex].y) < Planets[EarthIndex].radius)
-                {    
-                    HoverEffect(ctx, Planets[EarthIndex]);
-
-                    if(mouse.clicked && !ZaWarudoIsRunning)
-                        ZaWarudoStart(canvas, ctx, StarDots, orbits, AsteroidsBelt, Sun, Planets);
-                    
-                }
+            if (ringProgress > 0 && Ring) {
+                const maxRadius = Math.hypot(canvas.width, canvas.height) / Ring.MinRadiusPercentage;
+                Ring.update(ctx, Planets[2], maxRadius * ringProgress);
             }
-
+            const earthAvailable = TimeStopState === 'idle' || TimeStopState === 'stopped';
+            const overEarth = earthAvailable && IsOverObject(Planets[2]);
+            const overSun = TimeStopState === 'idle' && IsOverObject(Sun);
+            canvas.style.cursor = !MadeInHeavenIsRunning && (overEarth || overSun) ? 'pointer' : 'default';
+            if (!MadeInHeavenIsRunning) {
+                if (overEarth) HoverEffect(ctx, Planets[2]);
+                if (overSun) HoverEffect(ctx, Sun);
+            }
         }
         else if (TimeSpeed == 0 && MadeInHeavenIsRunning)
         {
@@ -1040,6 +1051,8 @@ function OrbitScene(canvas, ctx, StarDots, orbits, AsteroidsBelt, Sun, Planets) 
 function SpiralScene(canvas, ctx, StarDots, AsteroidsBelt, Planets) {
     let StartTime = performance.now();
     let duration = 29;
+    const initialExtent = Math.min(canvas.width, canvas.height);
+    const initialBlackHoleRadius = Reset.radius;
     let BlackHoleRadius = Reset.PhotonSphereRadius;
     let Axys = (canvas.width**2 + canvas.height**2)**(1/2);
     let StarDotsInitialAngles = StarDots.map((StarDot) => StarDot.angle);
@@ -1084,9 +1097,10 @@ function SpiralScene(canvas, ctx, StarDots, AsteroidsBelt, Planets) {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             let CurrentTime = performance.now();
             let elapsed = (CurrentTime - StartTime) / 1000;
+            const resizeScale = Math.min(canvas.width, canvas.height) / initialExtent;
 
             if(elapsed > duration && elapsed - duration < 1)
-                Reset.setRadius(Reset.radius * (1 - (elapsed - duration)));
+                Reset.setRadius(initialBlackHoleRadius * (1 - (elapsed - duration)));
 
             if(elapsed < duration + 1)
                 Reset.draw(ctx);
@@ -1105,7 +1119,7 @@ function SpiralScene(canvas, ctx, StarDots, AsteroidsBelt, Planets) {
             {
                 let PercentagePassed = elapsed / StarDotsSpiralsDuration[i];
                 let angle = StarDotsInitialAngles[i] + Math.min(1, PercentagePassed) * 2 * Math.PI * StarDots[i].spirals;
-                let radius = StarDotsInitialRadius[i] * (1 - Math.min(1, PercentagePassed));
+                let radius = StarDotsInitialRadius[i] * resizeScale * (1 - Math.min(1, PercentagePassed));
 
                 if(StarDots[i].DistanceRadius > BlackHoleRadius)
                     StarDots[i].update(canvas, ctx, angle, radius, true);
@@ -1116,7 +1130,7 @@ function SpiralScene(canvas, ctx, StarDots, AsteroidsBelt, Planets) {
             for(let i = 0; i < AsteroidsBelt.length; i++)
             {
                 let angle = AsteroidsInitialAngles[i] + (Math.min(1, PercentagePassed) * 2 * Math.PI * AsteroidsBelt[i].spirals) * (180 / Math.PI);
-                let radius = AsteroidsInitialRadius[i] * (1 - Math.min(1, PercentagePassed));
+                let radius = AsteroidsInitialRadius[i] * resizeScale * (1 - Math.min(1, PercentagePassed));
 
                 if(AsteroidsBelt[i].DistanceRadius > BlackHoleRadius)
                     AsteroidsBelt[i].update(canvas, ctx, angle, radius, true);
@@ -1126,7 +1140,7 @@ function SpiralScene(canvas, ctx, StarDots, AsteroidsBelt, Planets) {
             for(let i = 0; i < Planets.length; i++)
             {
                 let angle = PlanetsInitialAngles[i] + (Math.min(1, PercentagePassed) * 2 * Math.PI * Planets[i].spirals) * (180 / Math.PI);
-                let radius = PlanetsInitialRadius[i] * (1 - Math.min(1, PercentagePassed));
+                let radius = PlanetsInitialRadius[i] * resizeScale * (1 - Math.min(1, PercentagePassed));
 
                 if(Planets[i].OrbitRadius > BlackHoleRadius)
                     Planets[i].update(ctx, angle, radius, true);
@@ -1135,7 +1149,7 @@ function SpiralScene(canvas, ctx, StarDots, AsteroidsBelt, Planets) {
             for(let satellite in Satellites)
             {
                 let angle = SatellitesInitialAngles[satellite] + (Math.min(1, PercentagePassed) * 2 * Math.PI * Satellites[satellite].spirals) * (180 / Math.PI);
-                let radius = SatellitesInitialRadius[satellite] * (1 - Math.min(1, PercentagePassed));
+                let radius = SatellitesInitialRadius[satellite] * resizeScale * (1 - Math.min(1, PercentagePassed));
 
                 if(Satellites[satellite].RelativeOrbitRadius > BlackHoleRadius)
                     Satellites[satellite].update(ctx, angle, radius);
@@ -1158,162 +1172,63 @@ function SpiralScene(canvas, ctx, StarDots, AsteroidsBelt, Planets) {
     animate();
 }
 
-function ZaWarudoStart(canvas, ctx, StarDots, orbits, AsteroidsBelt, Sun, Planets) {
-    let StartDuration = 4;
-    let delay = 2;
-    let StartTime;
-    let ended = false;
-    let Ring = new ZaWarudoRing(Planets[2]);
-    let radius = 0;
-    let Axys = (canvas.width**2 + canvas.height**2)**(1/2);
-    let MaxRadius = Axys * (1/Ring.MinRadiusPercentage);
-
-    function update(){
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        let currentTime = performance.now();
-        let elapsed = (currentTime - StartTime) / 1000;
-        
-        for(let i = 0; i < StarDots.length; i++)
-            StarDots[i].draw(ctx);
-
-        for(let i = 0; i < orbits.length; i++)
-            if(i !== 4)
-                orbits[i].draw(ctx);
-        
-        for(let i = 0; i < AsteroidsBelt.length; i++)
-            AsteroidsBelt[i].draw(ctx);
-
-        Sun.draw(ctx);
-
-        for(let i = 0; i < Planets.length; i++)
-        {
-            Planets[i].draw(ctx);
-
-            for(let j = 0; j < Planets[i].Satellites.length; j++)
-                Planets[i].Satellites[j].draw(ctx);
-        }
-
-        ZaWarudoIsRunning = (elapsed < StartDuration) ? true : false;
-
-        if(ZaWarudoIsRunning && radius < MaxRadius)
-        {
-            radius = MaxRadius * (elapsed / StartDuration);
-            Ring.update(ctx, Planets[2], radius);
-        }
-
-        if(!ZaWarudoIsRunning)
-        {
-            let EarthIndex = 2
-
-            if(Math.abs(mouse.x - Planets[EarthIndex].x) < Planets[EarthIndex].radius && Math.abs(mouse.y - Planets[EarthIndex].y) < Planets[EarthIndex].radius)
-            {    
-                HoverEffect(ctx, Planets[EarthIndex]);
-
-                if(mouse.clicked && !ZaWarudoIsRunning)
-                {
-                    ZaWarudoEnd(canvas, ctx, StarDots, orbits, AsteroidsBelt, Sun, Planets);
-                    mouse.clicked = false;
-                }
-            }
-        }
-    }
-
-    function animate() {
-        if(!ended)
-        {
-            update();
-            requestAnimationFrame(animate);
-        }
-    }
-
-    mouse.clicked = false;
+function ZaWarudoStart() {
+    if (TimeStopState !== 'idle' || MadeInHeavenIsRunning || UniverseIsResetting) return;
+    PreviousTimeSpeed = TimeSpeed;
+    TimeStopState = 'starting';
+    TimeStopStartedAt = performance.now();
     ZaWarudoIsRunning = true;
-    preciseSetTimeout(() => {ZaWarudoIsRunning = false}, StartDuration * 1000);
-    preciseSetTimeout(() => {PreviousTimeSpeed = TimeSpeed; TimeSpeed = 0;}, delay * 1000);
-    TheWorldStart.play();
-    ToggleBWFilter(canvas, StartDuration, delay, true);
-    preciseSetTimeout(() => {
-        StartTime = performance.now();
-        animate();
-    }, delay * 1000);
+    Ring = new ZaWarudoRing(Planets[2]);
+    PlayAudio(TheWorldStart);
 }
 
-function ZaWarudoEnd(canvas, ctx, StarDots, orbits, AsteroidsBelt, Sun, Planets) {
-    let EndDuration = 2;
-    let EndTime;
-    let ended = false;
-    let Ring = new ZaWarudoRing(Planets[2]);
-    let Axys = (canvas.width**2 + canvas.height**2)**(1/2);
-    let MaxRadius = Axys * (1/Ring.MinRadiusPercentage);
-    let radius = MaxRadius;
-
-    function update(){
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        let currentTime = performance.now();
-        let elapsed = (currentTime - EndTime) / 1000;
-        
-        for(let i = 0; i < StarDots.length; i++)
-            StarDots[i].draw(ctx);
-
-        for(let i = 0; i < orbits.length; i++)
-            if(i !== 4)
-                orbits[i].draw(ctx);
-        
-        for(let i = 0; i < AsteroidsBelt.length; i++)
-            AsteroidsBelt[i].draw(ctx);
-
-        Sun.draw(ctx);
-
-        for(let i = 0; i < Planets.length; i++)
-        {
-            Planets[i].draw(ctx);
-
-            for(let j = 0; j < Planets[i].Satellites.length; j++)
-                Planets[i].Satellites[j].draw(ctx);
-        }
-
-        ZaWarudoIsRunning = (elapsed < EndDuration) ? true : false;
-
-        if(ZaWarudoIsRunning && radius > 0)
-        {
-            radius = MaxRadius * (1 - (elapsed / EndDuration));
-            Ring.update(ctx, Planets[2], radius);
-        }
-
-        if(!ZaWarudoIsRunning)
-        {
-            ended = true;
-            mouse.clicked = false;
-        }
-    }
-
-    function animate() {
-        if(!ended)
-        {
-            update();
-            requestAnimationFrame(animate);
-        }
-    }
-
-    mouse.clicked = false;
+function ZaWarudoEnd() {
+    if (TimeStopState !== 'stopped') return;
+    TimeStopState = 'ending';
+    TimeStopStartedAt = performance.now();
     ZaWarudoIsRunning = true;
-    preciseSetTimeout(() => {ZaWarudoIsRunning = false}, EndDuration * 1000);
-    preciseSetTimeout(() => {TimeSpeed = PreviousTimeSpeed; PreviousTimeSpeed = 0;}, EndDuration * 1000);
-    TheWorldEnd.play();
-    ToggleBWFilter(canvas, EndDuration, 0, false);
-    preciseSetTimeout(() => {
-        EndTime = performance.now();
-        animate();
-    }, 0);
+    PlayAudio(TheWorldEnd);
+}
+
+function UpdateTimeStop() {
+    const elapsed = (performance.now() - TimeStopStartedAt) / 1000;
+    let gray = 0;
+    let progress = 0;
+    if (TimeStopState === 'starting') {
+        if (elapsed >= 2) TimeSpeed = 0;
+        progress = Math.min(1, Math.max(0, (elapsed - 2) / 4));
+        gray = Math.min(1, Math.max(0, (elapsed - 2) / 2));
+        if (elapsed >= 6) {
+            TimeStopState = 'stopped';
+            ZaWarudoIsRunning = false;
+        }
+    } else if (TimeStopState === 'stopped') {
+        gray = 1;
+    } else if (TimeStopState === 'ending') {
+        progress = Math.max(0, 1 - elapsed / 2);
+        gray = progress;
+        if (elapsed >= 2) {
+            TimeStopState = 'idle';
+            ZaWarudoIsRunning = false;
+            TimeSpeed = PreviousTimeSpeed;
+            PreviousTimeSpeed = 0;
+            Ring = null;
+        }
+    }
+    canvas.style.filter = `grayscale(${gray * 100}%)`;
+    canvas.dataset.filter = gray;
+    return progress;
+}
+
+function IsOverObject(object, x = mouse.x, y = mouse.y) {
+    return Math.hypot(x - object.x, y - object.y) <= object.radius + 4;
 }
 
 function MadeInHeavenStart() {
-    if(!MadeInHeavenIsRunning)
+    if(!MadeInHeavenIsRunning && TimeStopState === 'idle' && !UniverseIsResetting)
     {
         MadeInHeavenIsRunning = true;
         let SpeedPhase1 = 2901;
-        let SpeedPhase2 = 6501;
-        let SpeedPhase3 = 10001;
 
         let DPhase0 = 17;
         let DPhase1 = 5;
@@ -1325,54 +1240,41 @@ function MadeInHeavenStart() {
         MadeInHeavenText.id = 'MadeInHeaven';
         MadeInHeavenText.innerHTML = 'Made in<br>Heaven';
         
-        Crucified.play();
+        PlayAudio(Crucified);
 
         preciseSetTimeout(() =>
         {
-            for(let i = 0; i < SpeedPhase1; i++)
-                preciseSetTimeout(() => {
-                    TimeSpeed = 1+i/100;
-                }, i/SpeedPhase1 * SpeedPhase1);
+            AccelerateTime(1, 30, SpeedPhase1);
             
         }, DPhase0 * 1000);
         preciseSetTimeout(() =>
         {
-            MadeInHeavenAudio.play();
+            PlayAudio(MadeInHeavenAudio);
             document.body.appendChild(MadeInHeavenText);
         }, (DPhase0 - 1) * 1000);
         preciseSetTimeout(() =>
         {
             Clock(DPhase2);
 
-            for(let i = SpeedPhase1 + 99; i < SpeedPhase2; i++)
-                preciseSetTimeout(() => {
-                    TimeSpeed = i/100;
-                }, (i - SpeedPhase1 - 99)/(SpeedPhase2 - SpeedPhase1) * DPhase2 * 1000);
+            AccelerateTime(30, 65, DPhase2 * 1000);
 
             document.body.removeChild(MadeInHeavenText);
-            CurrentTime = performance.now();
         }, (DPhase0 + DPhase1) * 1000);
         preciseSetTimeout(() =>
         {
             DaylightCycle(DPhase3);
 
-            for(let i = SpeedPhase2 - 1; i < SpeedPhase3; i++)
-                if(i % 200 == 0)
-                    preciseSetTimeout(() => {
-                        TimeSpeed = i/100;
-                    }, (i - SpeedPhase2 + 1)/(SpeedPhase3 - SpeedPhase2) * DPhase3 * 1000);
+            AccelerateTime(65, 100, DPhase3 * 1000);
 
-            CurrentTime = performance.now();
         }, (DPhase0+DPhase1+DPhase2) * 1000);
         preciseSetTimeout(() =>
         {
             TimeSpeed = 0;
-            UniverseResetAudio.play();
+            PlayAudio(UniverseResetAudio);
         }, (DPhase0+DPhase1+DPhase2+DPhase3) * 1000);
         preciseSetTimeout(() => 
         {
             MadeInHeavenIsRunning = false;
-            CurrentTime = performance.now();
         }, (DPhase0+DPhase1+DPhase2+DPhase3 + DPhase4) * 1000);
     }
 }
@@ -1384,37 +1286,63 @@ function() {
     init();
 });
 
-window.addEventListener('mousemove',
-function(event) {
-    mouse.x = event.x;
-    mouse.y = event.y;
+function UpdatePointer(event) {
+    const rect = canvas.getBoundingClientRect();
+    mouse.x = (event.clientX - rect.left) * canvas.width / rect.width;
+    mouse.y = (event.clientY - rect.top) * canvas.height / rect.height;
+}
+
+window.addEventListener('pointermove', function(event) {
+    if (canvas) UpdatePointer(event);
 });
 
-window.addEventListener('click',
-function(){
-    mouse.clicked = true;
-    preciseSetTimeout(() => mouse.clicked = false, 10);
+window.addEventListener('click', function(event) {
+    if (!canvas || event.target !== canvas || MadeInHeavenIsRunning || UniverseIsResetting) return;
+    UpdatePointer(event);
+    if (IsOverObject(Planets[2])) {
+        if (TimeStopState === 'idle') ZaWarudoStart();
+        else if (TimeStopState === 'stopped') ZaWarudoEnd();
+    } else if (TimeStopState === 'idle' && IsOverObject(Sun)) {
+        MadeInHeavenStart();
+    }
 });
 
-window.addEventListener('resize',
-function() {
-    canvas = document.getElementById('canvas');
-    ctx = canvas.getContext('2d', { willReadFrequently: true });
+window.addEventListener('resize', function() {
+    if (!canvas || !StarDots) return;
+    const oldWidth = canvas.width;
+    const oldHeight = canvas.height;
+    const scale = Math.min(window.innerWidth, window.innerHeight) / Math.min(oldWidth, oldHeight);
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
-
-    for (let i = 0; i < StarDots.length; i++)
-        StarDots[i].redraw(canvas);
-
-    for (let i = 0; i < orbits.length; i++)
-        orbits[i].redraw(canvas);
-
-    Sun.setCenter(canvas.width / 2, canvas.height / 2, 0);
-    Sun.update(ctx, 0, 0);
-
-    if(UniverseIsResetting)
-    {
-        Reset.setCenter(canvas.width / 2, canvas.height / 2, 0);
-        Reset.draw(ctx);
+    for (const star of StarDots) {
+        star.x *= canvas.width / oldWidth;
+        star.y *= canvas.height / oldHeight;
+        star.DistanceRadius = Math.hypot(star.x - canvas.width / 2, star.y - canvas.height / 2);
+        star.angle = Math.atan2(star.y - canvas.height / 2, star.x - canvas.width / 2);
+        star.XPercentage = star.x / canvas.width;
+        star.YPercentage = star.y / canvas.height;
+        star.trail = [];
     }
+    for (const orbit of orbits) {
+        orbit.CenterX = canvas.width / 2;
+        orbit.CenterY = canvas.height / 2;
+        orbit.radius *= scale;
+    }
+    for (const asteroid of AsteroidsBelt) {
+        asteroid.setCenter(canvas.width / 2, canvas.height / 2, 0);
+        asteroid.setPosition(canvas, asteroid.angle, asteroid.DistanceRadius * scale);
+        asteroid.trail = [];
+    }
+    Sun.setCenter(canvas.width / 2, canvas.height / 2, 0);
+    Sun.setPosition(0, 0);
+    for (const planet of Planets) {
+        planet.setCenter(canvas.width / 2, canvas.height / 2, 0);
+        planet.setPosition(planet.OrbitAngle, planet.OrbitRadius * scale);
+        planet.trail = [];
+        for (const satellite of planet.Satellites) {
+            if (UniverseIsResetting) satellite.setCenter(canvas.width / 2, canvas.height / 2, 0);
+            satellite.setPosition(satellite.OrbitAngle, satellite.OrbitRadius * (UniverseIsResetting ? scale : 1));
+        }
+    }
+    Reset.setCenter(canvas.width / 2, canvas.height / 2);
 });
