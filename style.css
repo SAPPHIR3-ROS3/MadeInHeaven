@@ -95,3 +95,7 @@ canvas
     background: linear-gradient(to left, rgba(255, 255, 255, 0.6) 80%, rgba(50, 50, 50, 0.6));
     z-index: 4;
 }
+
+#MadeInHeaven, .watch, .night-to-day, .day-to-night {
+    pointer-events: none;
+}
