@@ -16,6 +16,7 @@ canvas
 
 @font-face {
     font-family: 'OldLondon';
+    font-display: swap;
     src: url('./media/font/OldLondon.ttf') format('truetype');
 }
 
